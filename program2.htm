@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+</head>
+<body>
+<div>
+<p>The following program demonstrates arithmetic sound synthesis with JavaScript. It calculates a ten-second sine wave and sends it to the browser as a file download. Without encoding it in a media container such as <A href="http://soundfile.sapp.org/doc/WaveFormat/">WAV</a> or <a href="https://www.matroska.org/technical/guides/faq/index.html">MKA</a>, the data is uncompressed "Pulse Code Modulation." One can play it back now by downloading <a href="https://sourceforge.net/projects/audacity/">Audacity 2.1.0</a>, selecting File \ Import \ Data, choosing the PCM output file from the "Run example" button below, and entering these parameters:
+      <br/><br/>Encoding: Signed 16 bit PCM
+      <br/>Byte order: Little-endian
+      <br/>Channels: 1 Channel (Mono)
+      <br/>Start offset: 0 bytes
+      <br/>Amount to import: 100%
+      <br/>Sample rate: 44100 Hz
+      <br/></p>
+      <p><br/><button onClick="demo1();">Run example</button> *Works in the latest version of Mozilla Firefox</p>
+      <p><br/></p>
+</div>
+</body>
+</html>
+<script>
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+// title: PCM demo
+// author: Jesse Wiesenborn
+// date: 9/6/2018
+// version 0.2
+
+//
+// Calculate a ten-second sine wave at 440 Hz in a signed
+// 16-bit array, then save it to a PCM data file.
+//
+function demo1() {
+  var samplingRate = 44100;
+  var bitDepth = 65535 / 2;
+  var frequency = 440;
+  var durationInSeconds = 10;
+  var lpcm16 = new Int16Array(samplingRate * durationInSeconds);
+  for (i = 0; i < lpcm16.length; i++) {
+    lpcm16[i] = Math.sin((Math.PI * 2 * i * frequency) / samplingRate) * bitDepth; }
+  download('demo.pcm',signedInt16ArrayToUnsigned(lpcm16)); }
+
+//
+// Convert a signed 16-bit array to unsigned 16-bit integers.
+//
+function signedInt16ArrayToUnsigned(arr) {
+  var returnString = "";
+  for (i = 0; i < arr.length; i++) {
+    sample = arr[i];
+    if (sample >= 0) {
+      var r = integerToByte_LittleEndian(sample); }
+    else if (sample < 0) {
+      sample = sample + 65536; // (16^4)
+      var r = integerToByte_LittleEndian(sample); }
+    returnString = returnString.concat(r); }
+  return returnString; }
+
+//
+// Convert one 16-bit integer to hexadecimal bytes, big-endian,
+
+// 
+function integerToByte_BigEndian(s) {
+  var doubleCheck = s;
+  var int4 = s % 16;
+  s = parseInt(s / 16);
+  var int3 = s % 16;
+  s = parseInt(s / 16);
+  var int2 = s % 16;
+  s = parseInt(s / 16);
+  var int1 = s % 16;
+  s = parseInt(s / 16); 
+  //
+  // Make sure the hexadecimal-converted value equals the original value.
+  //if (doubleCheck != validate(int1, int2, int3, int4)) {
+  //  alert("Failure: integerToByte_BigEndian(" + s + ") != " + validate(int1, int2, int3, int4) + "."); }
+  //
+  
+  // and append leading %s for the URI stream encoding.
+  return "%" + intToHex(int1) + intToHex(int2) + "%" + intToHex(int3) + intToHex(int4); }
+
+//
+// Convert one 16-bit integer to hexadecimal bytes, little-endian,
+// 
+function integerToByte_LittleEndian(s) {
+  var doubleCheck = s;
+  var int1 = s % 16;
+  s = parseInt(s / 16);
+  var int2 = s % 16;
+  s = parseInt(s / 16);
+  var int3 = s % 16;
+  s = parseInt(s / 16);
+  var int4 = s % 16;
+  s = parseInt(s / 16); 
+  
+  // and append leading %s for the URI stream encoding.
+  return "%" + intToHex(int2) + intToHex(int1) + "%" + intToHex(int4) + intToHex(int3); }
+
+//
+// Convert an integer in the range [0,15] to hexadecimal.
+//
+function intToHex(n) {
+  if (n < 10) {
+    if (n >= 0) {
+      return n.toString(); }
+    else { alert("Error: intToHex(" + n + ")"); } }
+  switch (n) {
+    case 10:
+      var r = "a";
+      break;
+    case 11:
+      var r = "b";
+      break;
+    case 12:
+      var r = "c";
+      break;
+    case 13:
+      var r = "d";
+      break;
+    case 14:
+      var r = "e";
+      break;
+    case 15:
+      var r = "f";
+      break;
+    default:
+      alert("Error: intToHex(" + n + ")");
+      break; }
+  return r; }
+  
+//
+// Send the data in a URI stream to a downloadable file.
+// Source: https://stackoverflow.com/questions/2897619/using-html5-javascript-to-generate-and-save-a-file  
+//
+function download(filename, data) {
+  var pom = document.createElement('a');
+  pom.setAttribute('href', 'data:audio/pcm;charset=utf-8,' + data);
+  pom.setAttribute('download', filename);
+  if (document.createEvent) {
+    var event = document.createEvent('MouseEvents');
+    event.initEvent('click', true, true);
+    pom.dispatchEvent(event); }
+  else {
+    pom.click(); } }
+
+//
+// Verify the unsigned byte computes back to the correct integer.
+//
+//function validate(w,x,y,z) {
+//  var w = w * 16 * 16 * 16;
+//  var x = x * 16 * 16;
+//  var y = y * 16;
+//  return w + x + y + z; }
+
+</script>
