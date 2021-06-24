@@ -1,25 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-</head>
-<body>
-<div>
-<p>The following program demonstrates arithmetic sound synthesis with JavaScript. It calculates a ten-second sine wave and sends it to the browser as a file download. Without encoding it in a media container such as <A href="http://soundfile.sapp.org/doc/WaveFormat/">WAV</a> or <a href="https://www.matroska.org/technical/guides/faq/index.html">MKA</a>, the data is uncompressed "Pulse Code Modulation." One can play it back now by downloading <a href="https://sourceforge.net/projects/audacity/">Audacity 2.1.0</a>, selecting File \ Import \ Data, choosing the PCM output file from the "Run example" button below, and entering these parameters:
-      <br/><br/>Encoding: Signed 16 bit PCM
-      <br/>Byte order: Little-endian
-      <br/>Channels: 1 Channel (Mono)
-      <br/>Start offset: 0 bytes
-      <br/>Amount to import: 100%
-      <br/>Sample rate: 44100 Hz
-      <br/></p>
-      <p><br/><button onClick="demo1();">Run example</button> *Works in the latest version of Mozilla Firefox</p>
-      <p><br/></p>
-</div>
-</body>
-</html>
-<script>
-
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -29,6 +7,14 @@
 // author: Jesse Wiesenborn
 // date: 9/6/2018
 // version 0.2
+
+// The following program demonstrates arithmetic sound synthesis with JavaScript. It calculates a ten-second sine wave and sends it to the browser as a file download. Without encoding it in a media container such as <A href="http://soundfile.sapp.org/doc/WaveFormat/">WAV</a> or <a href="https://www.matroska.org/technical/guides/faq/index.html">MKA</a>, the data is uncompressed "Pulse Code Modulation." One can play it back now by downloading <a href="https://sourceforge.net/projects/audacity/">Audacity 2.1.0</a>, selecting File \ Import \ Data, choosing the PCM output file from the "Run example" button below, and entering these parameters:
+// Encoding: Signed 16 bit PCM
+// Byte order: Little-endian
+// Channels: 1 Channel (Mono)
+// Start offset: 0 bytes
+// Amount to import: 100%
+// Sample rate: 44100 Hz
 
 //
 // Calculate a ten-second sine wave at 440 Hz in a signed
@@ -154,5 +140,3 @@ function download(filename, data) {
 //  var x = x * 16 * 16;
 //  var y = y * 16;
 //  return w + x + y + z; }
-
-</script>
