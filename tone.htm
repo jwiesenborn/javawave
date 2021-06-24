@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Sound Synthesis</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+    .row.content {height: 720px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height: auto;} 
+    }
+    
+    /* Tab code from https://www.computerhope.com/issues/ch001034.htm */
+    .tab1 { margin-left: 2em; }
+    .tab2 { margin-left: 4em; }
+    .tab3 { margin-left: 6em; }
+    
+    .codebox {
+    font-family: monospace;
+    font-size: 9pt;
+    color: blue;
+    background-color: cornsilk;
+    width: 70%;
+    border: 1px;
+    }
+
+}
+    
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav">
+      <h4>Sound Synthesis</h4>
+      <ul class="nav nav-pills nav-stacked">
+        <li><a href="index.htm">Home</a></li>
+        <li><a href="theory.htm">Hypothesis</a></li>
+        <li><a href="program.htm">Example Program</a></li>
+        <li><a href="harmony.htm">Harmonic Computation</a></li>
+        <li><a href="frequency.htm">The Frequency Equation</a></li>
+        <li><a href="triad.htm">A Triad</a></li>
+        <li><a href="timbre.htm">Wave Graph</a></li>
+        <li class="active"><a href="tone.htm">Tone</a></li>
+        <li><a href="sequences.htm">Sequences</a></li>
+        <li><a href="wave.htm">The WAV format</a></li>
+        <li><a href="offsets.htm">Offsets (Sequences Part 2)</a></li>
+        <li><a href="musicxml.htm">MusicXML</a></li>
+        <li><a href="synthesis.htm">Synthesis</a></li>
+        <li><a href="a_sigh.htm">A Sigh</a></li>
+        <li><a href="2019-05-26.htm">Streaming</a></li>
+      </ul><br>
+    </div>
+
+    <div class="col-sm-9">
+      <h4><small>TONE</small></h4>
+      <hr>
+      <h3>Tone</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 2 March 2019</h5>
+      <p>Wind instruments like a pipe organ, brass, or woodwind have a tube in which the sound resonates. String instruments have a resonating chamber that amplifies and expands the vibration of the string. The sine wave we have calculated so far is just that: a string in a vast empty space that goes nowhere. Its <i>embouchure</i> is too narrow. </p>
+      <p>Our next experiment will expand this wave from the narrow precision of one frequency to a bell-shaped integral like the horn of a trumpet. The mathematical result is a ball of waves ranging between two note fractions centered at the desired frequency as a limit.</p>
+      <p>Recalling that the frequencies of two different notes are exponentially scaled, we'll use the frequency equation to determine the upper and lower bounds at equal logarithmic distances. Let's try plus-and-minus one-tenth note of concert A to get started:</p>
+      <p>440<sub>Upper bound(0.1)</sub> = 440 &bull; 2<sup>(0.1/12)</sup> = 442.55 Hz</p>
+      <p>440<sub>Lower bound(0.1)</sub> = 440 &bull; 2<sup>(-0.1/12)</sup> = 437.47 Hz</p>
+      <br/>
+      <h5><span class="glyphicon glyphicon-time"></span> Update by Jesse, 10 March 2019</h5>
+      <p>The aperture is computed as a circle of waves. Let the wave density <i>&omega;</i> = 256; 128 for the frequency <i>f</i> > 440.00 Hz and 128 for the frequency <i>f</i> < 440.00 Hz. The notes have loudest volume closer to 440.00 Hz and decrease in volume as they approach their outer bounds. There are two functions to compute this. First we'll add a parameter to the wave computation that changes its amplitude as a function of time. Then we will create a loop to make each of the 256 notes surrounding 440.00 Hz. I noticed when getting back to the code that we haven't compartmentalized the note equation into a parameterized function, so that change is implemented here as well.</p>
+      <p align='center'><canvas id="dietCanvas" width="450" height="100" style="border:1px dashed #888888;"></canvas><br/><i>Sound wave with decreasing amplitude</i></p>
+      <p><br/><button onClick="download('note.pcm',signedInt16ArrayToUnsigned(lpcm16));">download</button> <a href="tone.js">Source code</a> *Runs in the latest version of Mozilla Firefox. Requires importing to audacity as in <a href="program.htm">example 1</a>.</p>
+      <p><br/></p>
+      <h5><span class="glyphicon glyphicon-time"></span> Update by Jesse, 15 April 2019</h5>
+      <p>We could create timbre by oscillating the note's frequency up and down from its central pitch: a wave of waves.
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid">
+
+</body>
+</html>
+
+<script>
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+// title: tone
+// author: jesse wiesenborn
+// date: 3/16/2019
+// version 0.3
+
+// Global constants and objects
+var samplingRate = 44100;
+var bitDepth = 65535 / 2;
+var durationInSeconds = 8;
+var lpcm16 = new Int16Array(samplingRate * durationInSeconds);
+
+//
+// Calculate a sound wave with decreasing amplitude in a signed
+// 16-bit array, then save it to a PCM data file.
+//
+function dietCalc() {
+  var frequency = 440.00; //hertz of the note to play
+  var volume = 0.01; //volume is a multiplier between 0 and 1 (webaudio)
+  var duration = lpcm16.length;
+  
+  var uBound = 442.55;
+  var lBound = 437.47;  
+  var upDif = uBound - frequency;
+  var lowDif = lBound - frequency;
+  
+  for (i = 0; i < duration; i++) {
+    var changePitch = i / duration;
+    var a = pumpkinWave(i, frequency);
+    //var b = pumpkinWave(i, frequency - changePitch(lowDif));
+    
+    var v = volumeShape(i, duration);
+    //console.log(v);
+    lpcm16[i] = a * v;
+    }
+  //download('triad.pcm',signedInt16ArrayToUnsigned(lpcm16)); 
+}
+
+//
+function changePitch() {
+
+
+}
+
+//
+//
+function volumeShape(i, duration) {
+  var v = (Math.cos(Math.PI * i / duration * .5));
+  return v;
+}
+
+//
+//
+//
+function pumpkinWave(i, frequency) {
+  var a = (Math.sin((Math.PI * 2 * i * frequency) / (samplingRate)) ) * bitDepth; 
+  return a;
+}
+
+// Initialize the canvas and brush objects
+var canvas = document.getElementById("dietCanvas");
+var brush = canvas.getContext("2d");
+//var drawX = 0;
+//var drawY = 0;
+var canWidth = parseInt(canvas.width);
+var canHeight = parseInt(canvas.height / 2);
+//alert(beginX + ', ' + beginY);
+var graphX = 0;
+var graphY = 0;
+
+///////////////////////////////////////
+dietCalc(); // calculate equation array
+///////////////////////////////////////
+
+drawWave();
+// Draw the equation onto the canvas
+function drawWave() {
+  brush.beginPath();
+  brush.lineWidth = '1';
+  var lineLength = lpcm16.length;
+  var delta = lineLength / canWidth;
+  brush.moveTo(0, canHeight + lpcm16[0]);
+  for (x = 0; x < canWidth; x++) {
+    var dx = parseInt(x * delta);
+    var drawX = x;
+    var drawY = parseInt((lpcm16[dx] / bitDepth) * canHeight) + canHeight;
+    brush.lineTo(drawX, drawY);
+    //alert(x + ':' + dx + ': (' + drawX + ', ' + drawY + ')');
+  } 
+  brush.stroke();
+}
+
+//
+// Convert a signed 16-bit array to unsigned 16-bit integers,
+// then to hexadecimal byte format.
+//
+function signedInt16ArrayToUnsigned(arr) {
+  var returnString = "";
+  for (i = 0; i < arr.length; i++) {
+    sample = arr[i];
+    if (sample >= 0) {
+      var r = integerToByte_LittleEndian(sample); }
+    else if (sample < 0) {
+      sample = sample + 65536; // (16^4)
+      var r = integerToByte_LittleEndian(sample); }
+    returnString = returnString.concat(r); }
+  return returnString; }
+
+//
+// Convert one 16-bit integer to hexadecimal bytes, big-endian,
+// and append leading %s for the URI stream encoding.
+// 
+function integerToByte_BigEndian(s) {
+  var doubleCheck = s;
+  var int4 = s % 16;
+  s = parseInt(s / 16);
+  var int3 = s % 16;
+  s = parseInt(s / 16);
+  var int2 = s % 16;
+  s = parseInt(s / 16);
+  var int1 = s % 16;
+  s = parseInt(s / 16); 
+  //
+  // Make sure the hexadecimal-converted value equals the original value.
+  //if (doubleCheck != validate(int1, int2, int3, int4)) {
+  //  alert("Failure: integerToByte_BigEndian(" + s + ") != " + validate(int1, int2, int3, int4) + "."); }
+  //
+  return "%" + intToHex(int1) + intToHex(int2) + "%" + intToHex(int3) + intToHex(int4); }
+
+//
+// Convert one 16-bit integer to hexadecimal bytes, little-endian,
+// and append leading %s for the URI stream encoding.
+// 
+function integerToByte_LittleEndian(s) {
+  var doubleCheck = s;
+  var int1 = s % 16;
+  s = parseInt(s / 16);
+  var int2 = s % 16;
+  s = parseInt(s / 16);
+  var int3 = s % 16;
+  s = parseInt(s / 16);
+  var int4 = s % 16;
+  s = parseInt(s / 16); 
+  return "%" + intToHex(int2) + intToHex(int1) + "%" + intToHex(int4) + intToHex(int3); }
+
+//
+// Convert an integer in the range [0,15] to hexadecimal.
+//
+function intToHex(n) {
+  if (n < 10) {
+    if (n >= 0) {
+      return n.toString(); }
+    else { alert("Error: intToHex(" + n + ")"); } }
+  switch (n) {
+    case 10:
+      var r = "a";
+      break;
+    case 11:
+      var r = "b";
+      break;
+    case 12:
+      var r = "c";
+      break;
+    case 13:
+      var r = "d";
+      break;
+    case 14:
+      var r = "e";
+      break;
+    case 15:
+      var r = "f";
+      break;
+    default:
+      alert("Error: intToHex(" + n + ")");
+      break; }
+  return r; }
+  
+//
+// Send the data in a URI stream to a downloadable file.
+// Source: https://stackoverflow.com/questions/2897619/using-html5-javascript-to-generate-and-save-a-file  
+//
+function download(filename, data) {
+  var pom = document.createElement('a');
+  pom.setAttribute('href', 'data:audio/pcm;charset=utf-8,' + data);
+  pom.setAttribute('download', filename);
+  if (document.createEvent) {
+    var event = document.createEvent('MouseEvents');
+    event.initEvent('click', true, true);
+    pom.dispatchEvent(event); }
+  else {
+    pom.click(); } }
+
+//
+// Verify the unsigned byte computes back to the correct integer.
+//
+//function validate(w,x,y,z) {
+//  var w = w * 16 * 16 * 16;
+//  var x = x * 16 * 16;
+//  var y = y * 16;
+//  return w + x + y + z; }
+
+</script>
