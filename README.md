@@ -17,5 +17,5 @@ Use the Canvas element to draw data forms as computed for comprehensive review.<
 <br/>
 MusicXML<br/>
 Functions for processing MusicXML file input and generating audio sound as output<br/>
-<br/><br/>
+<br/>
 Developed from a capstone project started over at http://symmetry.cafe/sounds/<br/>
