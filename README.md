@@ -1,7 +1,7 @@
 # javawave
 
 Description<br/>
-This project computes sound waves in JavaScript, and encodes the output for playback on an electronic machine.<br/>
+This project computes sound waves in JavaScript, and encodes the output for playback on a computer speaker.<br/>
 <br/>
 File Encoding<br/>
 Includes functions for encoding data in canonical "WAVE PCM soundfile format" as specified at http://soundfile.sapp.org/doc/WaveFormat/<br/>
