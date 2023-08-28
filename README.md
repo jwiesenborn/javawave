@@ -1,9 +1,9 @@
 # javawave
-User Interface (new!)<br/>
-User-friendly textbox for typing in musical sequence codes (index.htm).<br/>
-<br/>
 Description<br/>
 This project computes sound waves in JavaScript, and encodes the output for playback on a computer speaker.<br/>
+<br/>
+User Interface (new!)<br/>
+User-friendly textbox for typing in musical sequence codes (index.htm).<br/>
 <br/>
 File Encoding<br/>
 Includes functions for encoding data in canonical "WAVE PCM soundfile format" as specified at http://soundfile.sapp.org/doc/WaveFormat/<br/>
