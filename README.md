@@ -1,6 +1,6 @@
 # javawave
 Description<br/>
-This project computes sound waves in JavaScript, and encodes the output for playback on a computer speaker.<br/>
+This project computes sound waves in JavaScript and encodes the output for playback on a computer speaker.<br/>
 <br/>
 User Interface (new!)<br/>
 User-friendly textbox for typing in musical sequence codes (index.htm).<br/>
