@@ -25,7 +25,8 @@
     <br>8-bit Sound and Music Engine<br><br>
     by Jesse Wiesenborn
     <br><br>In 1991, Epic Megagames made PC gaming history with <i>ZZT</i>, a DOS-based adventure with a built-in programming language called <i>ZZT-OOP</i>. This allowed players to create, among other things, their own musical sequences. Now you can create <i>ZZT-OOP</i> sounds and musical sequences in your own web browser with this JavaScript applet.<br/><br/>
-    How does it work? Because sound and music are composed of waves, this program uses trigonometric functions to compute audio waveforms based on user-specified input and parameters. Typing a musical note sequence into the box below, for example, 'ICDEFGAB+CH.CQX' will play an ascending C scale in eighth notes, followed by a dotted half-note C and a quarter note rest. For variations on "Twinkle, Twinkle, Little Star," you can copy-paste the sequence from <a href='twinkle.txt'>this textfile</a> into the box and click 'Play sequence'. To hear sound, you'll need computer speakers or headphones. You can also export to WAV format for playback on an external audio application. <br/><br/>
+    Because sound and music are composed of waves, this program uses trigonometric functions (and one or two derivatives) to compute audio waveforms based on user-specified input and parameters. Typing a musical note sequence into the box below, for example, 'ICDEFGAB+CH.CQX' will play an ascending C scale in eighth notes, followed by a dotted half-note C and a quarter note rest. For variations on "Twinkle, Twinkle, Little Star," you can copy-paste the sequence from <a href='twinkle.txt'>this textfile</a> into the box and click 'Play sequence'.<br/><br/>
+    To hear sound, you'll need computer speakers or headphones. You can also export to WAV format for playback on an external audio application. <br/><br/>
     
     <!--
     <br>Software Requirements Specification
@@ -43,12 +44,14 @@ Sample rate: <input type="text" id="samplerate" value="44100"></input> samples p
 <br><br>
 Tempo: Q = <input type="text" id="tempo" value="160"></input> beats per minute
 <br><br>
+Volume: 1 / <input type="text" id="volume" value="1"></input> (This fraction reduces the volume of the sound output by the denominator entered here. You can use this if you are exporting multiple voices to combine in an external application such as Audacity. Typically this value is the total number of voices in your composition, i.e., if your composition has three voices, type 3 here. If you have four, type 4 etc.)
+<br><br>
 #Play:<br>
 <textarea id="musicbox" rows="15" cols="75" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
 <br><br><!--
 <button type="button" id="savetext">Save code</button>--> <button type="button" id="play" onClick="play('play');">Play sequence</button> <button type="button" id="Export to WAV" onClick="play('export');">Export to WAV</button>
 <br>
-<br>The following syntactical codes will run in this application. It plays original <i>ZZT</i> syntax with the exception of scientific notation (which defines octaves as C to B instead of A to G) and no drums yet (sorry!) but does add some new features such as 64th notes and extended range. This table is courtesy of <a href="https://museumofzzt.com/article/view/747/zzt-oop-101/#play">Museum of ZZT</a>:<br>
+<br>The following syntactical codes will run in this application. It plays original <i>ZZT</i> syntax with the exception of scientific notation (which defines octaves as C to B instead of A to G) and no drums (yet!) but does add some new features such as 64th notes and extended range. This table is courtesy of <a href="https://museumofzzt.com/article/view/747/zzt-oop-101/#play">Museum of ZZT</a>:<br>
 <br>
 <table border=1>
     <tr>
@@ -70,7 +73,7 @@ Tempo: Q = <input type="text" id="tempo" value="160"></input> beats per minute
         <tr><td class="c">!</td><td>Flat</td></tr>
     </tr>
     <tr>
-        <th rowspan="11">Basic Durations</th>
+        <th rowspan="17">Basic Durations</th>
     </tr>
     <tr><td class="c">W</td><td>Whole Note</td></tr>
     <tr><td class="c">H</td><td>Half Note</td></tr>
@@ -82,6 +85,13 @@ Tempo: Q = <input type="text" id="tempo" value="160"></input> beats per minute
     <tr><td class="c">N</td><td>128th note (new!)</td></tr>
     <tr><td class="c">U</td><td>256th note (new!)</td></tr>
     <tr><td class="c">V</td><td>512th note (new!)</td></tr>
+    <tr><td class="c">O</td><td>1,024th note (experimental)</td></tr>
+    <tr><td class="c">R</td><td>2,048th note (experimental)</td></tr>
+    <tr><td class="c">P</td><td>4,096th note (experimental)</td></tr>
+    <tr><td class="c">J</td><td>8,192nd note (experimental)</td></tr>
+    <tr><td class="c">K</td><td>16,384th note (experimental)</td></tr>
+    <tr><td class="c">L</td><td>32,768th note (experimental)</td></tr>
+    <!--<tr><td class="c">Z</td><td>65,536th note (experimental)</td></tr>-->
     <tr>
         <th rowspan="2">Advanced Durations</th>
         <td class="c">3</td>
@@ -93,7 +103,7 @@ Tempo: Q = <input type="text" id="tempo" value="160"></input> beats per minute
     </tr>
     <tr>
     <tr><th rowspan="3">Octaves<br>(Default: <s>3</s> 4)</th></tr>
-    <tr><td class="c">+</td><td>Increases the octave by 1 up to a maximum of <s>6</s> 10.</td></tr>
+    <tr><td class="c">+</td><td>Increases the octave by 1 up to a maximum of <s>6</s> 9.</td></tr>
     <tr><td class="c">-</td><td>Decreases the octave by 1 down to a minimum of <s>1</s> -2.</td></tr>
     </tr>
 <!--
@@ -110,7 +120,7 @@ Tempo: Q = <input type="text" id="tempo" value="160"></input> beats per minute
     -->
 </table>
 <br/><br/>For more examples, try playing the sound effects listed at <a href="https://wiki.zzt.org/wiki/Sound_effects">https://wiki.zzt.org/wiki/Sound_effects</a>
-<br/><br/>
+<br/><br/>Thank you to <a href="http://soundfile.sapp.org/doc/WaveFormat/">soundfile++</a> for providing the Microsoft WAV file format specification.<br/><br/>
 </center>
 <script>
 
@@ -121,8 +131,8 @@ Tempo: Q = <input type="text" id="tempo" value="160"></input> beats per minute
 
 // title: 8-bit Sound and Music Engine
 // author: Jesse Wiesenborn
-// date: 9/10/2023
-// version 0.15
+// date: 9/13/2023
+// version: 0.17
 // git: https://github.com/jwiesenborn/javawave
 
 // Global constants and objects
@@ -145,9 +155,10 @@ var frequency = 0;
 var actualDuration = 0;
 var note = "";
 var compareOutput = "";
+var volumeMultiplier = 1.0; //new
 
 // This ArrayBuffer default may seem large at 26 MB, but this is necessary because JavaScript can't dynamically change the size of the array itself
-// (or maybe I just don't know how to do it yet!) It shouldn't be too slow because the Dataview doesn't need to access all of it at once.
+// (or maybe I just don't know how to do it yet.) It shouldn't be too slow because the Dataview doesn't need to access all of it at once.
 // I initially tried resizing the buffer on-the-fly with buffer.resize() but it's not supported.
 const buffer = new ArrayBuffer(26460000); //26460000 is 5 minutes of 44,100 16-bit samples per second
 var view = new DataView(buffer, 0); 
@@ -184,6 +195,17 @@ function getTempo(){
   console.log("Tempo = " + tempo);
 }
 
+// Get volume denominator from textbox and assign multiplier to global variable.
+function getVolume(){
+    var volumeDenominator = parseFloat(document.getElementById('volume').value);
+    if (volumeDenominator < 1) {
+        volumeDenominator = 1;
+    }
+    document.getElementById('volume').value = volumeDenominator;
+    volumeMultiplier = 1 / volumeDenominator;
+    console.log("Volume = " + volumeMultiplier);
+}
+
 // Reset variables so you can change the code text and play a new sequence
 // (this is faster than clearing the whole array buffer)
 function resetVars(){
@@ -200,7 +222,7 @@ function resetVars(){
     musicText = ''; //needs global scope for some reason
     sampleRate = 0;
     tempo = 0;
-    quarterNoteDuration = 0;
+    quarterNoteDuration = 0.000000;
     action = "";
     frequency = 0;
     actualDuration = 0;
@@ -209,6 +231,7 @@ function resetVars(){
     global_direction = ""; //plus-or-minus semaphore
     xCursor = 0;
     compareOutput = "";
+    volumeMultiplier = 1.0;
     console.clear();
 }
 
@@ -226,6 +249,7 @@ function play(action1) {
     getBitDepth();
     getSampleRate();
     getTempo();
+    getVolume();
     quarterNoteDuration = (sampleRate / tempo) * 60;
     musicText = document.getElementById("musicbox").value;
     //In the future, it would be nice to send this data to the server (with the user's permission) to save their compositions.
@@ -332,6 +356,34 @@ function parseText() {
                 note=tryNote(note, octave, duration);
                 duration = 0.0078125;
                 break;
+            case "O": //1,024th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.00390625;
+                break;
+            case "R": //2,048th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.001953125;
+                break;
+            case "P": //4,096th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.0009765625;
+                break;
+            case "J": //8,192nd-note
+                note=tryNote(note, octave, duration);
+                duration = 0.00048828125;
+                break;
+            case "K": //16,384th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.000244140625;
+                break;
+            case "L": //32,768th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.0001220703125;
+                break;
+            //case "Z": //approx one sample at t=160 (didn't work)
+            //    note=tryNote(note, octave, duration);
+            //    duration = 0.00006103515625;
+            //    break;
             case "3":
                 note=tryNote(note, octave, duration);
                 duration = duration / 3;
@@ -417,6 +469,7 @@ function parseText() {
         } //end of switch case
   //alert(str.charAt(i)); //for debugging
   } //end of musicText iterator
+  
   note=tryNote(note, octave, duration);
 
   //Encode sequence of notes to data stream.
@@ -440,6 +493,7 @@ function parseText() {
 
 // Convert each user-defined note into terms of frequency, octave, and duration.
 // Assume A4 = 440 hz
+// Remember, in terms of parsing the text, tryNote executes the "previous" note instead of the "current" note.
 function tryNote(note, octave, duration){
   if (note!='') {
     //console.log("Trying note " + note + ", octave " + octave + ", duration " + duration); //for debugging
@@ -480,9 +534,6 @@ function tryNote(note, octave, duration){
       }
     }
     switch(octave){
-      case 10: 
-        frequency = frequency * 64;
-        break;
       case 9: 
         frequency = frequency * 32;
         break;
@@ -536,11 +587,11 @@ function tryNote(note, octave, duration){
 }
 
 // The purpose of this function is to append notes of a sequence together in such a way as to avoid gaps or jumps (discontinuities) in the data signal.
-// If you put all the notes together without "sewing" them together to make one continuous wave, you'll hear clicks and pops between each note.
+// If you put all the notes together without "stitching" them together to make one continuous wave, you'll hear clicks and pops between each note.
 // To create a smooth sound, we start each new note at the same point the previous note left off.
 // It was very useful to view the waveforms with Audacity (audacityteam.org) when putting this together.
 function computeNote(){
-  console.log("Computing frequency " + frequency + ", actual duration " + actualDuration + " samples"); //for debugging
+  //console.log("Computing frequency " + frequency + ", actual duration " + actualDuration + " samples"); //for debugging
 
   //Make a data view from the buffer.
   //8-bit samples are stored as unsigned bytes, ranging from 0 to 255. 16-bit samples are stored as 2's-complement signed integers, ranging from -32768 to 32767. 
@@ -561,8 +612,8 @@ function computeNote(){
 
   //var noteArray = new Int16Array(noteDuration); // deprecated
 
-  // As part of the process of "sewing" the waves of two different notes together,
-  // the program has to discern whether the curve is sloping up or down at the point the wave ends and starts a new note.
+  // As part of the process of "stitching" the waves of two different notes together,
+  // the program has to discern whether the curve is sloping up or down at the point one note-wave ends and a new one begins.
   // We use xOffset in the trigonometric computation to determine the starting point of each consecutive wave/note.
   var yOffset = global_y_Offset;
   var xOffset = 0;
@@ -618,16 +669,18 @@ function computeNote(){
 
   //console.log("xCursor = " + xCursor); //for debugging
 
-  // Compare each sample with the sample before it to determine whether the slope is positive or negative. (Is there a better way to do this?)
-  // Set global semaphores to start the consecutive note and the point the previous note ended.
+  // Derive computeWave(x) to determine whether the slope is positive or negative.
+  // Set global semaphores to start the consecutive note at the same point the previous note ended.
   if (eightBit == true){
-    global_direction = determineUpOrDown(view.getUint8(xCursor-1),view.getUint8(xCursor)); //noteArray[x-2], noteArray[x-1]);
+    // global_direction = determineUpOrDown(view.getUint8(xCursor-1),view.getUint8(xCursor)); //noteArray[x-2], noteArray[x-1]); //deprecated
+    global_direction = deriveSlope(x, frequency, xOffset, yOffset);
     //global_y_Offset = view.getUint8(xCursor-1) / bitDepth; //noteArray[x-1] / bitDepth; //deprecated
     global_y_Offset = c / bitDepth;
     //console.log("value at xCursor-2=" + (xCursor -2) + " is " + view.getUint8(xCursor-2));
     //console.log("value at xCursor-1=" + (xCursor -1) + " is " + view.getUint8(xCursor-1));
   } else if (sixteenBit == true){  
-    global_direction = determineUpOrDown(view.getInt16(xCursor-2),view.getInt16(xCursor)); //noteArray[x-4], noteArray[x-2]);
+    // global_direction = determineUpOrDown(view.getInt16(xCursor-2),view.getInt16(xCursor)); //noteArray[x-4], noteArray[x-2]); //deprecated
+    global_direction = deriveSlope(x, frequency, xOffset, yOffset);
     //global_y_Offset = view.getInt16(xCursor-2) / bitDepth; //noteArray[x-2] / bitDepth; //deprecated
     global_y_Offset = c / bitDepth;
     //console.log("value at xCursor-5=" + (xCursor -5) + " is " + view.getInt16(xCursor-5));
@@ -647,52 +700,65 @@ function computeWave(i, frequency, xOffset, yOffset) {
   //var a = (Math.sin(((Math.PI * 2 * i * frequency) + (Math.asin(yOffset) * samplingRate) ) / samplingRate) ) * bitDepth; //deprecated
   var a = (Math.sin(((Math.PI * 2 * i * frequency) + (xOffset * (Math.asin(yOffset) * sampleRate))) / sampleRate) ) * xOffset * bitDepth; 
   //console.log(a + " = (Math.sin(((Math.PI * 2 * " + i + " * " + frequency + ") + (" + xOffset + "* (Math.asin(" + yOffset + ") * " + sampleRate + "))) / " + sampleRate + ") ) * " + xOffset + " * " + bitDepth + "; )"); //for debugging
-  return a;
+  return a * volumeMultiplier;
 }
 
 
-// Stream to computer audio
-function wavStream(data) {
-  var pom = document.createElement('audio');
-  pom.setAttribute('autoplay', 'autoplay');
-  pom.setAttribute('src', 'data:audio/wav;charset=utf-8,' + data);
-
-  //Deprecated
-  //if (document.createEvent) {
-  //  var event = document.createEvent('MouseEvents');
-  //  event.initEvent('click', true, true);
-  //  pom.dispatchEvent(event); }
-  //else {
-  //  pom.click(); } 
+// I had a bone-headed realization when I was trying to figure out the slope of the curve at X:
+// "Oh yeah, that thing I studied for four years in math class!" 
+// This function replaces determineUpOrDown(), taking the derivative of our wave synthesis computeWave() function, which is the cosine of the same function.
+// If it's positive, then the slope is positive;
+// if it's negative, then the slope is negative;
+// and if it equals zero, then we take the derivative of the derivative, which is -sin of computeWave.
+function deriveSlope(i, frequency, xOffset, yOffset) {
+  var d = (Math.cos(((Math.PI * 2 * i * frequency) + (xOffset * (Math.asin(yOffset) * sampleRate))) / sampleRate) ) * xOffset * bitDepth; 
+  var dir = "";
+  if (d > 0) {
+    dir = "+";
+  }
+  else if (d < 0) {
+    dir = "-";
+  }
+  else if (d == 0) { 
+    var e = -1 * ((Math.sin(((Math.PI * 2 * i * frequency) + (xOffset * (Math.asin(yOffset) * sampleRate))) / sampleRate) ) * xOffset * bitDepth); 
+    if (e > 0) {
+      dir = "+";
+    }
+    else if (e < 0) {
+      dir = "-";
+    }
+  }
+  return dir;
 }
 
 
+// Deprecated. Keeping for posterity, but don't show this to my calculus teacher!
 // Find whether a curve is sloping upwards or downwards given two samples.
 // Sometimes with 8-bit waves, there are two adjacent samples with equal values,
 // causing the wave to "flip" to the other direction
 // (or if both samples equal zero.)
 // This could be fixed by comparing three or more samples, or by using 16-bit samples instead.
-function determineUpOrDown(a, b) {
-  var dir = "";
-  if (b > a) { // if the last two samples in the note are increasing, then the curve is going up.
-	dir = "+";
-  }
-  else if (b < a) { // if the last two samples in the note are decreasing, then the curve is going down.
-	dir = "-";
-  }
-  else if (a == b) { //If there is no curve, chances are the point is at the top or bottom of a curve,
-	if (a > 0) { // so if it's above zero then the curve is probably going downward
-	  dir = "-";
-	}
-	else if (a < 0) { // and if it's below zero then the curve is probably going upward
-	  dir = "+";
-	}
-  }
-  //console.log("a=" + a + ", b=" + b + ", dir=" + dir); //debugging
-  //console.log("Comparing curve slope: (" + a + ", " + b + "), result = " + dir); //debugging
-
-  return dir;
-}
+//function determineUpOrDown(a, b) {
+//  var dir = "";
+//  if (b > a) { // if the last two samples in the note are increasing, then the curve is going up.
+//	dir = "+";
+//  }
+//  else if (b < a) { // if the last two samples in the note are decreasing, then the curve is going down.
+//	dir = "-";
+//  }
+//  else if (a == b) { //If there is no curve, chances are the point is at the top or bottom of a curve,
+//	if (a > 0) { // so if it's above zero then the curve is probably going downward
+//	  dir = "-";
+//	}
+//	else if (a < 0) { // and if it's below zero then the curve is probably going upward
+//	  dir = "+";
+//	}
+//  }
+//  //console.log("a=" + a + ", b=" + b + ", dir=" + dir); //debugging
+//  //console.log("Comparing curve slope: (" + a + ", " + b + "), result = " + dir); //debugging
+//
+//  return dir;
+//}
 
 // Preliminary volume-shaping function
 //
@@ -709,6 +775,22 @@ function determineUpOrDown(a, b) {
  // var a = (Math.sin(((Math.PI * 2 * i * frequency) + (xOffset * (Math.asin(yOffset) * samplingRate))) / samplingRate) ) * xOffset * bitDepth; 
  // return a;
 //}
+
+
+// Stream to computer audio
+function wavStream(data) {
+  var pom = document.createElement('audio');
+  pom.setAttribute('autoplay', 'autoplay');
+  pom.setAttribute('src', 'data:audio/wav;charset=utf-8,' + data);
+
+  //Deprecated
+  //if (document.createEvent) {
+  //  var event = document.createEvent('MouseEvents');
+  //  event.initEvent('click', true, true);
+  //  pom.dispatchEvent(event); }
+  //else {
+  //  pom.click(); } 
+}
 
 
 // WAVE chunk
@@ -771,10 +853,10 @@ function dataChunk() {
 
 // A Memo on Format Conversion and Byte Endianness in JavaScript
 
-// It is very inefficient to convert the data buffer into a URI-encoded hexadecimal string,
+// It is inefficient to convert the data buffer into a URI-encoded hexadecimal string,
 // but browsers do not seem to allow direct streaming of the data buffer to output.
-// This appears to be the cost of writing a music synthesizer in JavaScript instead of C/C++.
-// If you know a way to send the data view directly to the output stream without re-encoding it, I would love to hear about it!
+// This appears to be a tradeoff of writing a music synthesizer in JavaScript instead of C/C++ or .NET.
+// If you know a way to send the data view directly to the output stream without re-encoding it, I would certainly love to hear about it!
 
 // According to MDN, "with a DataView you are able to control the byte-order.
 // It is big-endian by default and can be set to little-endian in the getter/setter methods."
