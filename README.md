@@ -3,7 +3,7 @@ Description<br/>
 This project computes sound waves in JavaScript and encodes the output for playback on a computer speaker.<br/>
 <br/>
 User Interface (new!)<br/>
-User interface for typing in musical sequence codes (index.htm). There is a demo at [jesusplaysmaracas.com](http://jesusplaysmaracas.com/).<br/>
+User interface for typing in musical sequence codes (index.htm). There is a demo at [wimpycat.com](http://wimpycat.com/).<br/>
 <br/>
 File Encoding<br/>
 Includes functions for encoding data in canonical "WAVE PCM soundfile format" as specified at http://soundfile.sapp.org/doc/WaveFormat/<br/>
