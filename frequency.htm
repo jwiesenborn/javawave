@@ -1,11 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+  <title>WimpyCat</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+    .row.content {height: 720px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height: auto;} 
+    }
+    
+    /* Tab code from https://www.computerhope.com/issues/ch001034.htm */
+    .tab1 { margin-left: 2em; }
+    .tab2 { margin-left: 4em; }
+    .tab3 { margin-left: 6em; }
+    
+    .codebox {
+    font-family: monospace;
+    font-size: 9pt;
+    color: blue;
+    background-color: cornsilk;
+    width: 70%;
+    border: 1px;
+    }
+
+}
+    
+  </style>
 </head>
 <body>
-<div>
-<p>In order to calculate harmonic intervals and chords, we first need to know the resonant frequencies of each note in the set. Concert A is commonly identified as 440 hertz (cycles per second). Octaves are higher or lower by a factor of two, not without debate, but generally due to properties inherent in physical matter. Notes in a Western scale are exponentially distributed between two octaves at twelve equal spaces. The logarithm of a note's frequency, then, is a base of 2 times the fraction of its relative position <i>n</i> in the scale:</p>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav">
+      <h4>WimpyCat: 8-bit Music Player</h4>
+      <ul class="nav nav-pills nav-stacked">
+        <li><a href="index.htm">Home</a></li>
+        <li><a href="theory.htm">Hypothesis</a></li>
+        <li><a href="program.htm">Example Program</a></li>
+        <li><a href="harmony.htm">Harmonic Computation</a></li>
+        <li class="active"><a href="frequency.htm">The Frequency Equation</a></li>
+        <li><a href="triad.htm">A Triad</a></li>
+        <li><a href="timbre.htm">Wave Graph</a></li>
+        <li><a href="tone.htm">Tone</a></li>
+        <li><a href="sequences.htm">Sequences</a></li>
+        <li><a href="wave.htm">The WAV format</a></li>
+        <li><a href="offsets.htm">Offsets (Sequences Part 2)</a></li>
+        <li><a href="musicxml.htm">MusicXML</a></li>
+        <li><a href="synthesis.htm">Synthesis</a></li>
+        <li><a href="a_sigh.htm">A Sigh</a></li>
+        <li><a href="2019-05-26.htm">Streaming</a></li>
+        <li><a href="player.htm">Player</a></li>
+      </ul><br>
+    </div>
+
+    <div class="col-sm-9">
+      <h4><small>FREQUENCY CALCULATION</small></h4>
+      <hr>
+      <h3>Frequency</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 2 February 2019</h5>
+      <p>In order to calculate harmonic intervals and chords, we first need to know the resonant frequencies of each note in the set. Concert A is commonly identified as 440 hertz (cycles per second). Octaves are higher or lower by a factor of two, not without debate, but generally due to properties inherent in physical matter. Notes in a Western scale are exponentially distributed between two octaves at twelve equal spaces. The logarithm of a note's frequency, then, is a base of 2 times the fraction of its relative position <i>n</i> in the scale:</p>
       <p><center>Frequency = 440 Hz &bull; 2<sup><i>n</i>/12</sup></p>
       <!--p align='center'><math>
 	Frequency = 440 Hz • 2<sup><box>n<over>2</box>
@@ -29,11 +106,28 @@
       <p>The same equation may also calculate descending pitches below n = 0 and those above n = 12 at the next octave. It may also compute notes between pitches, or frequencies at any fraction between steps; for instance a quarter-half-step above concert C would equal 440 Hz • 2<sup>3.25/12</sup> = 530.86 Hz.</p>
       <p>Update: Scientific notation octaves are {C-B}. 
 	<a href="https://en.wikipedia.org/wiki/Scientific_pitch_notation">https://en.wikipedia.org/wiki/Scientific_pitch_notation</a></p>
+      <!-- <h3>Nonwestern scales</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 24 February</h5>
+      <p>When computing frequencies mathematically, one can modify the equation to compute scales with different numbers of notes. The pentatonic scale, for instance, has notes at five equal spaces. Each note's frequency correlates with five equidistant notes in the Western scale:</p>
+      <p><center>Frequency = 466.16 &bull; 2<sup><i>n</i>/4</sup></center></p>
+      <p align='center'><table border=1>
+      <tr><td><b>Note</b></td><td><b><center><i>n</i>/12</center></b></td><td><b>Frequency</b></td></b></tr>
+      <tr><td>A</td><td><center>0/6</center></td><td>440.00 Hz</td></tr>
+      <tr><td>B</td><td><center>1/6</center></td><td>493.88 Hz</td></tr>
+      <tr><td>C#</td><td><center>2/6</center></td><td>554.37 Hz</td></tr>
+      <tr><td>D#</td><td><center>3/6</center></td><td>622.25 Hz</td></tr>
+      <tr><td>F</td><td><center>4/6</center></td><td>698.46 Hz</td></tr> -->
+      <!--<p><br/><button onClick="demo1();">Run example</button> *Works in the latest version of Mozilla Firefox</p>-->
+    </div>
+  </div>
 </div>
+
+<footer class="container-fluid">
+  <p>Jesse Wiesenborn | <a href="https://github.com/jwiesenborn/javawave">GitHub</a></p>
 </body>
 </html>
-<script>
 
+<script>
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////

@@ -1,115 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>WimpyCat</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <style>
-    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
-    .row.content {height: 720px}
-    
-    /* Set gray background color and 100% height */
-    .sidenav {
-      background-color: #f1f1f1;
-      height: 100%;
-    }
-    
-    /* Set black background color, white text and some padding */
-    footer {
-      background-color: #555;
-      color: white;
-      padding: 15px;
-    }
-    
-    /* On small screens, set height to 'auto' for sidenav and grid */
-    @media screen and (max-width: 767px) {
-      .sidenav {
-        height: auto;
-        padding: 15px;
-      }
-      .row.content {height: auto;} 
-    }
-    
-    /* Tab code from https://www.computerhope.com/issues/ch001034.htm */
-    .tab1 { margin-left: 2em; }
-    .tab2 { margin-left: 4em; }
-    .tab3 { margin-left: 6em; }
-    
-    .codebox {
-    font-family: monospace;
-    font-size: 9pt;
-    color: blue;
-    background-color: cornsilk;
-    width: 70%;
-    border: 1px;
-    }
-
-}
-    
-  </style>
-</head>
-<body>
-
-<div class="container-fluid">
-  <div class="row content">
-    <div class="col-sm-3 sidenav">
-      <h4>WimpyCat: 8-bit Music Player</h4>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="index.htm">Home</a></li>
-        <li><a href="theory.htm">Hypothesis</a></li>
-        <li><a href="program.htm">Example Program</a></li>
-        <li><a href="harmony.htm">Harmonic Computation</a></li>
-        <li><a href="frequency.htm">The Frequency Equation</a></li>
-        <li><a href="triad.htm">A Triad</a></li>
-        <li><a href="timbre.htm">Wave Graph</a></li>
-        <li><a href="tone.htm">Tone</a></li>
-        <li><a href="sequences.htm">Sequences</a></li>
-        <li><a href="wave.htm">The WAV format</a></li>
-        <li><a href="offsets.htm">Offsets (Sequences Part 2)</a></li>
-        <li><a href="musicxml.htm">MusicXML</a></li>
-        <li><a href="synthesis.htm">Synthesis</a></li>
-        <li><a href="a_sigh.htm">A Sigh</a></li>
-        <li class="active"><a href="2019-05-26.htm">Streaming</a></li>
-        <li><a href="player.htm">Player</a></li>
-      </ul><br>
-    </div>
-
-    <div class="col-sm-9">
-      <h4><small>STREAMING</small></h4>
-      <hr>
-      <h3>Streaming</h3>
-      <p><h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 26 May 2019</h5></p>
-      <p>Today I looked up how I might stream the WAV data in the web browser instead of download as a file, which took me to <a href="https://stackoverflow.com/questions/1175448/best-way-to-play-wav-files-in-the-browser">StackOverflow</a> and then to <a href="https://www.w3schools.com/html/html5_audio.asp">w3schools</a>. I changed the parameters of the file download function I had been using to match the HTML5 audio element. It turns out that we only need three new lines of code to stream the audio. Surprisingly, the stream is <i>more</i> compatible than the download, working in Firefox, Chrome, Safari, and Edge.</p>
-      <p><code>function wavStream(data) {<br/> 
-      var pom = document.createElement('audio');<br/> 
-      pom.setAttribute('autoplay', 'autoplay');<br/> 
-      pom.setAttribute('src', 'data:audio/wav;charset=utf-8,' + data);<br/> 
-      }<br/> </code></p>
-	  <p><button onclick='dietCalc()'>Test</button></p>
-
-    </div>
-  </div>
-</div>
-
-<footer class="container-fluid">
-  <p>Jesse Wiesenborn | <a href="https://github.com/jwiesenborn/javawave">GitHub</a></p>
-</body>
-</html>
-
-<script>
-
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-
-// title: streaming
+// title: XML sequencing
 // author: jesse wiesenborn
-// date: 5/26/2019
-// version 0.12
+// date: 4/20/2019
+// version 0.7
 
 // Global constants and objects
 var samplingRate = 44100; // samples per second
@@ -123,7 +15,7 @@ var numchannel = 1;
 var global_y_Offset = 0.000000; //vertical offset between notes
 var global_direction = ""; //plus-or-minus semaphore
 //
-// Calculate an ascending A scale in a signed
+// Compute an XML sequence into a signed
 // 16-bit array, then save it to a PCM data file.
 //
 function dietCalc() {
@@ -155,23 +47,8 @@ function dietCalc() {
 
   
   var outputFile = wavChunk(lpcm16.length) + fmtChunk() + dataChunk(lpcm16);
-  //download('test.wav', outputFile); 
-  wavStream(outputFile);
+  download('song1.wav', outputFile); 
   
-}
-
-//Test
-function wavStream(data) {
-  var pom = document.createElement('audio');
-  pom.setAttribute('autoplay', 'autoplay');
-  pom.setAttribute('src', 'data:audio/wav;charset=utf-8,' + data);
-
-  //if (document.createEvent) {
-  //  var event = document.createEvent('MouseEvents');
-  //  event.initEvent('click', true, true);
-  //  pom.dispatchEvent(event); }
-  //else {
-  //  pom.click(); } 
 }
 
 //compute one note given the parameters Frequency and Duration
@@ -442,7 +319,7 @@ function intToHex(n) {
 //
 function download(filename, data) {
   var pom = document.createElement('a');
-  pom.setAttribute('href', 'data:audio/wav;charset=utf-8,' + data);
+  pom.setAttribute('href', 'data:audio/pcm;charset=utf-8,' + data);
   pom.setAttribute('download', filename);
   if (document.createEvent) {
     var event = document.createEvent('MouseEvents');
@@ -482,16 +359,3 @@ function textTo4Byte_BigEndian(t) {
   return "%" + intToHex(int1) + intToHex(int2) + "%" + intToHex(int3) + intToHex(int4) 
   + "%" + intToHex(int5) + intToHex(int6) + "%" + intToHex(int7) + intToHex(int8); 
 }
-
-
-
-//
-// Verify the unsigned byte computes back to the correct integer.
-//
-//function validate(w,x,y,z) {
-//  var w = w * 16 * 16 * 16;
-//  var x = x * 16 * 16;
-//  var y = y * 16;
-//  return w + x + y + z; }
-
-</script>

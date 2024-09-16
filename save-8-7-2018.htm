@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Diet Pumpkin Machine</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>Saving Files</h1>
+  <p>7/31/2018</p>
+  <p>The purpose of this program is to make a file for the user to download.</p>
+  <p>This example uses code from a <a href="https://stackoverflow.com/questions/2897619/using-html5-javascript-to-generate-and-save-a-file">Stack Overflow thread</a>.</p>
+  <p>Another possible implementation is at <a href="https://stackoverflow.com/questions/31048215/how-to-create-txt-file-using-javascript-html5">this thread</a></p>
+  <p>For cross-browser compatibility, many people seem to prefer <a href="https://github.com/eligrey/FileSaver.js/">Filesaver.js</a> (<a href="https://eligrey.com/demos/FileSaver.js/">demo</a>)</p>
+<p><input type="button" onclick="download('test.txt', 'Hello world!');" value="Click here" /></p>
+
+</html>
+
+<script>
+
+function download(filename, text) {
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    pom.setAttribute('download', filename);
+
+    if (document.createEvent) {
+        var event = document.createEvent('MouseEvents');
+        event.initEvent('click', true, true);
+        pom.dispatchEvent(event);
+    }
+    else {
+        pom.click();
+    }
+}
+
+</script>

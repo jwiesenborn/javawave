@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>WimpyCat</title>
+  <title>Diet Pumpkin Machine</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -56,10 +56,10 @@
 <div class="container-fluid">
   <div class="row content">
     <div class="col-sm-3 sidenav">
-      <h4>WimpyCat: 8-bit Music Player</h4>
+      <h4>Diet Pumpkin Machine</h4>
       <ul class="nav nav-pills nav-stacked">
         <li><a href="index.htm">Home</a></li>
-        <li><a href="theory.htm">Hypothesis</a></li>
+        <li><a href="theory.htm">Computer Music Theory</a></li>
         <li><a href="program.htm">Example Program</a></li>
         <li><a href="harmony.htm">Harmonic Computation</a></li>
         <li><a href="frequency.htm">The Frequency Equation</a></li>
@@ -69,47 +69,184 @@
         <li><a href="sequences.htm">Sequences</a></li>
         <li><a href="wave.htm">The WAV format</a></li>
         <li><a href="offsets.htm">Offsets (Sequences Part 2)</a></li>
-        <li><a href="musicxml.htm">MusicXML</a></li>
-        <li><a href="synthesis.htm">Synthesis</a></li>
-        <li><a href="a_sigh.htm">A Sigh</a></li>
-        <li class="active"><a href="2019-05-26.htm">Streaming</a></li>
-        <li><a href="player.htm">Player</a></li>
+        <li class="active"><a href="musicxml.htm">MusicXML</a></li>
       </ul><br>
     </div>
 
     <div class="col-sm-9">
-      <h4><small>STREAMING</small></h4>
+      <h4><small>MUSIC XML</small></h4>
       <hr>
-      <h3>Streaming</h3>
-      <p><h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 26 May 2019</h5></p>
-      <p>Today I looked up how I might stream the WAV data in the web browser instead of download as a file, which took me to <a href="https://stackoverflow.com/questions/1175448/best-way-to-play-wav-files-in-the-browser">StackOverflow</a> and then to <a href="https://www.w3schools.com/html/html5_audio.asp">w3schools</a>. I changed the parameters of the file download function I had been using to match the HTML5 audio element. It turns out that we only need three new lines of code to stream the audio. Surprisingly, the stream is <i>more</i> compatible than the download, working in Firefox, Chrome, Safari, and Edge.</p>
-      <p><code>function wavStream(data) {<br/> 
-      var pom = document.createElement('audio');<br/> 
-      pom.setAttribute('autoplay', 'autoplay');<br/> 
-      pom.setAttribute('src', 'data:audio/wav;charset=utf-8,' + data);<br/> 
-      }<br/> </code></p>
-	  <p><button onclick='dietCalc()'>Test</button></p>
-
+      <h3>Music XML</h3>
+      <p><h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 15 April 2019</h5></p>
+      <p>Now that we have something to play sequences of notes, we need a way to code and decode note sequences. The data language XML turns out to be a great format for web applications. Web browsers already work with XML as hypertext webpages and it's globally standardized.</p>
+      <!--<p>I wrote my own XML parser in ECMAScript last year but it was <a href="musicXMLparser.js">sloppy</a>. Let's review the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction">Document Object Model</a> this time and take advantage of the built-in browser functionality.</p> 
+      <br/>
+      <p><h5><span class="glyphicon glyphicon-time"></span> Update by Jesse, 20 April 2019</h5></p>-->
+      <p>There's a promising example at W3schools on <A href="https://www.w3schools.com/xml/xml_parser.asp">parsing XML documents</a>. There is also some useful syntax about <a href="https://www.w3schools.com/xml/dom_nodes_traverse.asp">traversing the node tree</a>. The first file we're going to process is a MusicXML document that Dr. Vanderburg kindly provided last year. </p>
+      <p></p>
+	  <!--<p><button onclick='dietCalc()'>Download</button> *Requires the latest version of Mozilla Firefox</p>-->
+      <p id='XMLconsole'></p>
     </div>
   </div>
 </div>
 
-<footer class="container-fluid">
-  <p>Jesse Wiesenborn | <a href="https://github.com/jwiesenborn/javawave">GitHub</a></p>
 </body>
 </html>
 
 <script>
 
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-
-// title: streaming
+// title: musicXML decoder
 // author: jesse wiesenborn
-// date: 5/26/2019
-// version 0.12
+// date: 4/20/2019
+// version 0.7
+
+// Make an object
+//var dpm = new Object();
+//https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction
+
+//Open a source XML file
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+    dpmFunction(this);
+    }
+};
+xhttp.open("GET", "A_Sigh_20180125-b.xml", true);
+xhttp.send();
+
+//Put file in XML DOM object
+function dpmFunction(xml) {
+    //var xmlDoc = xml.responseXML;
+    //document.getElementById("musicXMLoutput").innerHTML =
+    //xmlDoc.getElementsByTagName("measure")[0].childNodes[0].nodeValue;
+    // paragraphs[0] is the first <p> element
+    // paragraphs[1] is the second <p> element, etc.
+    //document.getElementById("musicXMLoutput").innerHTML =+ paragraphs[0].nodeName.toString();
+    //alert(paragraphs[0].nodeName.toString());
+    
+    var xmlDoc = xml.responseXML;
+    var txt = "";
+    
+    //Find parts
+    var parts = xmlDoc.getElementsByTagName("part");
+    for (i = 0; i < parts.length; i++) {
+      //txt += parts[i].childNodes[0].nodeValue + "<br>";
+      txt += parts[i].id + "<br>";
+      
+      
+        //x = xmlDoc.documentElement.childNodes;
+        x = parts[i].childNodes;
+	for (j = 0; j < x.length; j++) {
+	    //txt += x[j].nodeName + ": <br>";// + x[j].childNodes[0].nodeValue + "<br>";
+	    if (x[j].nodeName == 'measure') {
+	        var measure = x[j].childNodes;
+	        txt += "measure: ";
+	        for (k = 0; k < measure.length; k++) {
+	            //txt += measure[k].nodeName + ": ";
+	            //txt += measure[k].nodeValue + "<br>";
+	            if (measure[k].nodeName == 'note') {
+	                var note = measure[k].childNodes;
+	                txt += "note: {";
+	                for (l = 0; l < note.length; l++) {
+	                    //txt += note[l].nodeName + ": ";
+	                    
+	                    if (note[l].nodeName == 'pitch') {
+	                        //txt += "pitch: ";
+	                        var pitch = note[l].childNodes;
+	                        
+	                        for (m = 0; m < pitch.length; m++) {
+	                            if (pitch[m].nodeName == 'step') {
+	                                txt += "step: ";
+	                                txt += pitch[m].innerHTML;
+	                                txt += "; ";
+	                            }
+	                            else if (pitch[m].nodeName == 'alter') {
+	                                txt += "alter: ";
+	                                txt += pitch[m].innerHTML;
+	                                txt += "; ";
+	                            }
+	                            else if (pitch[m].nodeName == 'octave') {
+	                                txt += "octave: ";
+	                                txt += pitch[m].innerHTML;
+	                                txt += "; ";
+	                            }
+	                            
+	                        }
+	                        //txt += "; ";
+	                        //txt += pitch[0].nodeName + ": "
+	                        //txt += pitch[0].nodeValue;// + "<br>";
+	                    
+	                    }
+	                    //else if (note[l].nodeName == 'type') {
+	                    //    txt += "type: ";
+	                    //    var noteType = note[l].innerHTML;
+	                    //    txt += noteType;
+				//txt += "; ";
+	                    //}
+	                    else if (note[l].nodeName == 'voice') {
+	                        txt += "voice: ";
+	                        var noteType = note[l].innerHTML;
+	                        txt += noteType;
+				txt += "; ";
+	                    }
+	                    else if (note[l].nodeName == 'duration') {
+	                        txt += "duration: ";
+	                        var noteType = note[l].innerHTML;
+	                        txt += noteType;
+				txt += "; ";
+	                    }
+	                    else if (note[l].nodeName == 'rest') {
+	                        txt += "rest; ";
+	                    }
+	                    //txt += note[l].nodeValue + "<br>";
+	                    //txt += "<br>";
+	                }
+	                txt += "} ";
+	            }
+	        }
+	        //txt += x[j].type + "<br>";
+	        txt += "<br>";
+	    }
+	    
+	}
+      
+      //Find notes in each part.
+      //var partChildNodes = parts[i].childNodes; //count the number of child nodes
+      //for (j = 0; j < partChildNodes.length; j++) { //iterate through each node
+        ///////var node = xmlDoc.getElementsByTagName("part")[i].childNodes[j]; //read the node
+        //var notes = partChildNodes.getElementsByTagName("note");
+        //var partNotes = xmlDoc.getElementsByTagName("part")[i].getElementsByTagName("note");
+        //var n=node.nodeValue;
+        //var n = partNotes.nodeValue;
+        
+        
+        //Find elements of each note (step, octave, type)
+        //var noteChildNodes = partNotes[j].childNodes;
+        //for (k = 0; k < partNotes.length; k++) { //iterate through each note
+          //txt += noteChildNodes[k].nodeName + ": ";// + noteChildNodes[k].childNodes[0].nodeValue + "<br>";
+        //var notePitch = partNotes[j].getElementsByTagName("pitch");
+        //var noteType = partNotes[j].getElementsByTagName("type");
+        
+        //Assume a note has one pitch
+        //var pitchStep = notePitch[0].getElementsByTagName("step");
+        //var pitchOctave = notePitch[0].getElementsByTagName("octave");
+        
+        
+        //txt += notePitch + "<br>";
+        //txt += noteOctave + "<br>";
+        //txt += noteType + "<br>";
+        
+        //xmlDoc.getElementsByTagName("measure")[j].childNodes[0].nodeValue;
+        //}
+      
+    }
+    
+document.getElementById("XMLconsole").innerHTML = txt; 
+}
+
+
+
+
 
 // Global constants and objects
 var samplingRate = 44100; // samples per second
@@ -119,16 +256,15 @@ var durationInSeconds = 3;
 var lpcm16 = new Int16Array(samplingRate * durationInSeconds);
 var numchannel = 1;
 
-
 var global_y_Offset = 0.000000; //vertical offset between notes
 var global_direction = ""; //plus-or-minus semaphore
 //
-// Calculate an ascending A scale in a signed
+// Compute an XML sequence into a signed
 // 16-bit array, then save it to a PCM data file.
 //
 function dietCalc() {
-  var frequency = 440.00; //hertz of the note to play
-  var volume = 0.01; //volume is a multiplier between 0 and 1
+  var frequency = 0.00; //440.00; //hertz of the note to play
+  //var volume = 0.01; //volume is a multiplier between 0 and 1
   var songDuration = lpcm16.length;
   
   var tempo = 100 / 60; //beats per second
@@ -155,23 +291,8 @@ function dietCalc() {
 
   
   var outputFile = wavChunk(lpcm16.length) + fmtChunk() + dataChunk(lpcm16);
-  //download('test.wav', outputFile); 
-  wavStream(outputFile);
+  download('song1.wav', outputFile); 
   
-}
-
-//Test
-function wavStream(data) {
-  var pom = document.createElement('audio');
-  pom.setAttribute('autoplay', 'autoplay');
-  pom.setAttribute('src', 'data:audio/wav;charset=utf-8,' + data);
-
-  //if (document.createEvent) {
-  //  var event = document.createEvent('MouseEvents');
-  //  event.initEvent('click', true, true);
-  //  pom.dispatchEvent(event); }
-  //else {
-  //  pom.click(); } 
 }
 
 //compute one note given the parameters Frequency and Duration
@@ -482,16 +603,5 @@ function textTo4Byte_BigEndian(t) {
   return "%" + intToHex(int1) + intToHex(int2) + "%" + intToHex(int3) + intToHex(int4) 
   + "%" + intToHex(int5) + intToHex(int6) + "%" + intToHex(int7) + intToHex(int8); 
 }
-
-
-
-//
-// Verify the unsigned byte computes back to the correct integer.
-//
-//function validate(w,x,y,z) {
-//  var w = w * 16 * 16 * 16;
-//  var x = x * 16 * 16;
-//  var y = y * 16;
-//  return w + x + y + z; }
-
+ 
 </script>

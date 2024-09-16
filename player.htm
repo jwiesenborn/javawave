@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>WimpyCat</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+    .row.content {height: 720px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height: auto;} 
+    }
+    
+    /* Tab code from https://www.computerhope.com/issues/ch001034.htm */
+    .tab1 { margin-left: 2em; }
+    .tab2 { margin-left: 4em; }
+    .tab3 { margin-left: 6em; }
+    
+    .codebox {
+    font-family: monospace;
+    font-size: 9pt;
+    color: blue;
+    background-color: cornsilk;
+    width: 70%;
+    border: 1px;
+    }
+
+}
+    
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav">
+      <h4>WimpyCat: 8-bit Music Player</h4>
+      <ul class="nav nav-pills nav-stacked">
+        <li><a href="index.htm">Home</a></li>
+        <li><a href="theory.htm">Hypothesis</a></li>
+        <li><a href="program.htm">Example Program</a></li>
+        <li><a href="harmony.htm">Harmonic Computation</a></li>
+        <li><a href="frequency.htm">The Frequency Equation</a></li>
+        <li><a href="triad.htm">A Triad</a></li>
+        <li><a href="timbre.htm">Wave Graph</a></li>
+        <li><a href="tone.htm">Tone</a></li>
+        <li><a href="sequences.htm">Sequences</a></li>
+        <li><a href="wave.htm">The WAV format</a></li>
+        <li><a href="offsets.htm">Offsets (Sequences Part 2)</a></li>
+        <li><a href="musicxml.htm">MusicXML</a></li>
+        <li><a href="synthesis.htm">Synthesis</a></li>
+        <li><a href="a_sigh.htm">A Sigh</a></li>
+        <li><a href="2019-05-26.htm">Streaming</a></li>
+        <li class="active"><a href="player.htm">Player</a></li>
+      </ul><br>
+    </div>
+
+    <div class="col-sm-9">
+      <h4><small>8-BIT MUSIC PLAYER</small></h4>
+      <hr>
+      <h3>Player Interface</h3>
+      <p><h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 16 September 2024</h5></p>
+      <p>In 1991, Epic Megagames made PC gaming history with <i>ZZT</i>, a DOS-based adventure with a built-in programming language called <i>ZZT-OOP</i>. This allowed players to create, among other things, their own musical sequences. Now you can create <i>ZZT-OOP</i> sounds and musical sequences in your own web browser with this JavaScript applet.<br/><br/>
+    Because sound and music are composed of waves, this program uses trigonometric functions (and one or two derivatives) to compute audio waveforms based on user-specified input and parameters. Typing a musical note sequence into the box below, for example, 'ICDEFGAB+CH.CQX' will play an ascending C scale in eighth notes, followed by a dotted half-note C and a quarter note rest. For variations on "Twinkle, Twinkle, Little Star," you can copy-paste the sequence from <a href='twinkle.txt' target='_blank'>this textfile</a> into the box and click 'Play sequence'.<br/><br/>
+    To hear sound, you'll need computer speakers or headphones. You can also export to WAV format for playback on an external audio application. </p>
+      
+      Bit depth: <input type="radio" id="8-bit" value="8-bit" name="bitdepth" checked><label for="8-bit">8-bit</label> | <input type="radio" id="16-bit" value="16-bit" name="bitdepth"><label for="16-bit">16-bit</label><br>
+<br>
+Sample rate: <input type="text" id="samplerate" value="44100"></input> samples per second (e.g., 44100)
+<br><br>
+Tempo: Q = <input type="text" id="tempo" value="160"></input> beats per minute
+<br><br>
+Volume: 1 / <input type="text" id="volume" value="1"></input> (This fraction reduces the volume of the sound output by the denominator entered here. You can use this if you are exporting multiple voices to combine in an external application such as Audacity. Typically this value is the total number of voices in your composition, i.e., if your composition has three voices, type 3 here. If you have four, type 4 etc.)
+<br><br>
+#Play:<br>
+<textarea id="musicbox" rows="15" cols="75" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+<br><br><!--
+<button type="button" id="savetext">Save code</button>--> <button type="button" id="play" onClick="play('play');">Play sequence</button> <button type="button" id="Export to WAV" onClick="play('export');">Export to WAV</button>
+<br>
+<br>The following syntactical codes will run in this application. It plays original <i>ZZT</i> syntax with the exception of scientific notation (which defines octaves as C to B instead of A to G) and no drums (yet!) but does add some new features such as 64th notes and extended range. This table is courtesy of <a href="https://museumofzzt.com/article/view/747/zzt-oop-101/#play">Museum of ZZT</a>:<br>
+<br>
+<table border=1>
+    <tr>
+        <th>-</th>
+        <th>Symbol</th><th>Effect</th>
+    </tr>
+    <tr>
+        <th>Basic Notes</th>
+        <td class="c">C<br>D<br>E<br>F<br>G<br>A<br>B<br></td>
+        <td>Plays note</td>
+    </tr>
+    <tr>
+        <th>Rest</th><td class="c">X</td>
+        <td>Rests</td>
+    </tr>
+    <tr>
+        <th rowspan="3">Accidentals<br>(Placed after a basic note)</th>
+        <tr><td class="c">#</td><td>Sharp</td></tr>
+        <tr><td class="c">!</td><td>Flat</td></tr>
+    </tr>
+    <tr>
+        <th rowspan="17">Basic Durations</th>
+    </tr>
+    <tr><td class="c">W</td><td>Whole Note</td></tr>
+    <tr><td class="c">H</td><td>Half Note</td></tr>
+    <tr><td class="c">Q</td><td>Quarter note</td></tr>
+    <tr><td class="c">I</td><td>Eighth note</td></tr>
+    <tr><td class="c">S</td><td>Sixteenth note</td></tr>
+    <tr><td class="c">T</td><td>Thirty-second note</td></tr>
+    <tr><td class="c">Y</td><td>64th note (new!)</td></tr>
+    <tr><td class="c">N</td><td>128th note (new!)</td></tr>
+    <tr><td class="c">U</td><td>256th note (new!)</td></tr>
+    <tr><td class="c">V</td><td>512th note (new!)</td></tr>
+    <tr><td class="c">O</td><td>1,024th note (experimental)</td></tr>
+    <tr><td class="c">R</td><td>2,048th note (experimental)</td></tr>
+    <tr><td class="c">P</td><td>4,096th note (experimental)</td></tr>
+    <tr><td class="c">J</td><td>8,192nd note (experimental)</td></tr>
+    <tr><td class="c">K</td><td>16,384th note (experimental)</td></tr>
+    <tr><td class="c">L</td><td>32,768th note (experimental)</td></tr>
+    <!--<tr><td class="c">Z</td><td>65,536th note (experimental)</td></tr>-->
+    <tr>
+        <th rowspan="2">Advanced Durations</th>
+        <td class="c">3</td>
+        <td>Triplet: Cuts the previous duration into thirds. (Ex: Q3CDE would play the C, D, and E notes totaling the time of a quarter note.)</td>
+    </tr>
+    <tr>
+        <td class="c">.</td>
+        <td>Time-and-a-half: Extends the current duration by 50%. (Ex: H.C would play a C-note with a duration equal to three quarter notes.)</td>
+    </tr>
+    <tr>
+    <tr><th rowspan="3">Octaves<br>(Default: <s>3</s> 4)</th></tr>
+    <tr><td class="c">+</td><td>Increases the octave by 1 up to a maximum of <s>6</s> 9.</td></tr>
+    <tr><td class="c">-</td><td>Decreases the octave by 1 down to a minimum of <s>1</s> -2.</td></tr>
+    </tr>
+<!--
+    <tr><th rowspan="10">Drums</th></tr>
+    <tr><td class="c">1</td><td>Tick</td></tr>
+    <tr><td class="c">2</td><td>Tweet</td></tr>
+    <tr><td class="c">4</td><td>Cowbell</td></tr>
+    <tr><td class="c">5</td><td>Hi snare</td></tr>
+    <tr><td class="c">6</td><td>High woodblock</td></tr>
+    <tr><td class="c">7</td><td>Low snare</td></tr>
+    <tr><td class="c">8</td><td>Low tom</td></tr>
+    <tr><td class="c">9</td><td>Low woodblock</td></tr>
+    <tr><td class="c">0</td><td>Bass drum</td></tr>
+    -->
+</table>
+<br/><br/>For more examples, try playing the sound effects listed at <a href="https://wiki.zzt.org/wiki/Sound_effects">https://wiki.zzt.org/wiki/Sound_effects</a>
+
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid">
+  <p>Jesse Wiesenborn | <a href="https://github.com/jwiesenborn/javawave">GitHub</a></p>
+</body>
+</html>
+
+<script>
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+// title: 8-bit Sound and Music Engine
+// author: Jesse Wiesenborn
+// date: 9/13/2023
+// version: 0.17
+// git: https://github.com/jwiesenborn/javawave
+
+// Global constants and objects
+var bitsPerSample = 0; //
+var bitDepth = 0; //((2 ^ bitsPerSample) - 1) / 2;
+var eightBit = false;
+var sixteenBit = false;
+var numchannel = 1;
+var global_y_Offset = 0.000000; //vertical offset between notes
+var global_direction = ""; //plus-or-minus semaphore
+var xCursor = 0; //xCursor is the offset in bytes
+var defaultDuration = 1; //quarter note
+var defaultOctave = 4; //default octave
+var musicText = ''; //needs global scope for some reason
+var sampleRate = 0;
+var tempo = 0;
+var quarterNoteDuration = 0;
+var action = "";
+var frequency = 0;
+var actualDuration = 0;
+var note = "";
+var compareOutput = "";
+var volumeMultiplier = 1.0; //new
+
+// This ArrayBuffer default may seem large at 26 MB, but this is necessary because JavaScript can't dynamically change the size of the array itself
+// (or maybe I just don't know how to do it yet.) It shouldn't be too slow because the Dataview doesn't need to access all of it at once.
+// I initially tried resizing the buffer on-the-fly with buffer.resize() but it's not supported.
+const buffer = new ArrayBuffer(26460000); //26460000 is 5 minutes of 44,100 16-bit samples per second
+var view = new DataView(buffer, 0); 
+
+// Get user-defined bit depth from radio button(s) and assign to global variable
+function getBitDepth(){
+  //console.log(document.getElementById('8-bit').checked + ", " + document.getElementById('16-bit').checked); //for debugging
+  if (document.getElementById('8-bit').checked == true) {
+    bitsPerSample = 8;
+    bitDepth = 255 / 2;
+    eightBit = true;
+    console.log("Bit depth: 8bit");
+  }
+  if (document.getElementById('16-bit').checked == true) {
+    bitsPerSample = 16;
+    bitDepth = 65535 / 2;
+    sixteenBit = true;
+    console.log("Bit depth: 16bit");
+  }
+}
+
+// Get user-defined sample rate from textbox and assign to variable.
+function getSampleRate(){
+  sampleRate = parseInt(document.getElementById('samplerate').value);
+  document.getElementById('samplerate').value = sampleRate;
+  console.log("Sample rate = " + sampleRate);
+  //console.log("Buffer resizeable? " + buffer.resizable); //for debugging
+}
+
+// Get tempo from textbox and assign to global variable.
+function getTempo(){
+  tempo = parseInt(document.getElementById('tempo').value);
+  document.getElementById('tempo').value = tempo;
+  console.log("Tempo = " + tempo);
+}
+
+// Get volume denominator from textbox and assign multiplier to global variable.
+function getVolume(){
+    var volumeDenominator = parseFloat(document.getElementById('volume').value);
+    if (volumeDenominator < 1) {
+        volumeDenominator = 1;
+    }
+    document.getElementById('volume').value = volumeDenominator;
+    volumeMultiplier = 1 / volumeDenominator;
+    console.log("Volume = " + volumeMultiplier);
+}
+
+// Reset variables so you can change the code text and play a new sequence
+// (this is faster than clearing the whole array buffer)
+function resetVars(){
+    bitsPerSample = 0; //
+    bitDepth = 0; //((2 ^ bitsPerSample) - 1) / 2;
+    eightBit = false;
+    sixteenBit = false;
+    numchannel = 1;
+    global_y_Offset = 0.000000; //vertical offset between notes
+    global_direction = ""; //plus-or-minus semaphore
+    xCursor = 0;
+    defaultDuration = 1; //quarter note
+    defaultOctave = 4; //default octave
+    musicText = ''; //needs global scope for some reason
+    sampleRate = 0;
+    tempo = 0;
+    quarterNoteDuration = 0.000000;
+    action = "";
+    frequency = 0;
+    actualDuration = 0;
+    note = "";
+    global_y_Offset = 0.000000; //vertical offset between notes
+    global_direction = ""; //plus-or-minus semaphore
+    xCursor = 0;
+    compareOutput = "";
+    volumeMultiplier = 1.0;
+    console.clear();
+}
+
+// User clicks the Play button.
+function play(action1) {
+
+  //reset cache
+  resetVars();
+
+  action = action1;
+
+  console.log("Initialized buffer to " + buffer.byteLength + " bytes");
+
+    //get user-defined parameters
+    getBitDepth();
+    getSampleRate();
+    getTempo();
+    getVolume();
+    quarterNoteDuration = (sampleRate / tempo) * 60;
+    musicText = document.getElementById("musicbox").value;
+    //In the future, it would be nice to send this data to the server (with the user's permission) to save their compositions.
+
+    if ((sampleRate > 0) && (tempo > 0)) {
+        //alert(textToDuration(musicText)); //for debugging
+
+        // Parse the user-defined text
+        parseText();
+
+    } else{
+      alert("Sample rate and tempo must be non-negative integers.")
+    }
+}
+
+
+// Parse the user-defined text.
+// This is a little bit tricky because notes are more than one character if a flat or a sharp is added.
+// So we keep each note in memory until we are sure the user has finished coding that note, i.e.,
+// when another note is begun and there are no more sharps and flats, such as when a new octave is defined,
+// a drum, a new note, new duration is defined, an unknown character etc
+function parseText() {
+  //alert(musicText); //for debugging
+    note = "";
+    var duration = defaultDuration;
+    var octave = defaultOctave;
+    var drum = -1;
+    var result = "";
+    var unknown = "";
+    for (var i = 0; i < musicText.length; i++) {
+        var c = musicText.charAt(i);
+        //run tryNote() when the note (or rest) is finished coding
+        //IF note !='' (note is not blank)
+        //AND (a new note is being started, a new duration is being defined, a new octave is being defined,
+        //    a drum is played, an invalid character is entered, or the end of the sequence is reached)
+        //BUT NOT when a sharp# or a flat(!) is being added, 
+        //THEN tryNote/append to buffer, and clear note variable
+        switch(c.toUpperCase()) {
+            case "C":
+                note=tryNote(note, octave, duration);
+                note = "C";
+                break;
+            case "D":
+                note=tryNote(note, octave, duration);
+                note = "D";
+                break;
+            case "E":
+                note=tryNote(note, octave, duration);
+                note = "E";
+                break;
+            case "F":
+                note=tryNote(note, octave, duration);
+                note = "F";
+                break;
+            case "G":
+                note=tryNote(note, octave, duration);
+                note = "G";
+                break;
+            case "A":
+                note=tryNote(note, octave, duration);
+                note = "A";
+                break;
+            case "B":
+                note=tryNote(note, octave, duration);
+                note = "B";
+                break;
+            case "Q":
+                note=tryNote(note, octave, duration);
+                duration = 1;
+                break;
+            case "H":
+                note=tryNote(note, octave, duration);
+                duration = 2;
+                break;
+            case "W":
+                note=tryNote(note, octave, duration);
+                duration = 4;
+                break;
+            case "I":
+                note=tryNote(note, octave, duration);
+                duration = 0.5;
+                break;
+            case "S":
+                note=tryNote(note, octave, duration);
+                duration = 0.25;
+                break;
+            case "T":
+                note=tryNote(note, octave, duration);
+                duration = 0.125;
+                break;
+            case "Y": //sixty-fourth note
+                note=tryNote(note, octave, duration);
+                duration = 0.0625;
+                break;
+            case "N": //128th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.03125;
+                break;
+            case "U": //256th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.015625;
+                break;
+            case "V": //512th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.0078125;
+                break;
+            case "O": //1,024th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.00390625;
+                break;
+            case "R": //2,048th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.001953125;
+                break;
+            case "P": //4,096th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.0009765625;
+                break;
+            case "J": //8,192nd-note
+                note=tryNote(note, octave, duration);
+                duration = 0.00048828125;
+                break;
+            case "K": //16,384th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.000244140625;
+                break;
+            case "L": //32,768th-note
+                note=tryNote(note, octave, duration);
+                duration = 0.0001220703125;
+                break;
+            //case "Z": //approx one sample at t=160 (didn't work)
+            //    note=tryNote(note, octave, duration);
+            //    duration = 0.00006103515625;
+            //    break;
+            case "3":
+                note=tryNote(note, octave, duration);
+                duration = duration / 3;
+                break;
+            case ".":
+                note=tryNote(note, octave, duration);
+                duration = duration * 1.5;
+                break;
+            case "X":
+                note=tryNote(note, octave, duration);
+                note = "X";
+                break;
+            case "#":
+                note = note + "#";
+                break;
+            case "!":
+                note = note + "!";
+                break;
+            case "+": 
+                note=tryNote(note, octave, duration);
+                octave = octave + 1;
+                break;
+            case "-": 
+                note=tryNote(note, octave, duration);
+                octave = octave - 1;
+                break;
+            case "1": 
+                note=tryNote(note, octave, duration);
+                drum = 1;
+                break;
+            case "2": 
+                note=tryNote(note, octave, duration);
+                drum = 2;
+                break;
+            case "4": 
+                note=tryNote(note, octave, duration);
+                drum = 4;
+                break;
+            case "5": 
+                note=tryNote(note, octave, duration);
+                drum = 5;
+                break;
+            case "6": 
+                note=tryNote(note, octave, duration);
+                drum = 6;
+                break;
+            case "7": 
+                note=tryNote(note, octave, duration);
+                drum = 7;
+                break;
+            case "8": 
+                note=tryNote(note, octave, duration);
+                drum = 8;
+                break;
+            case "9": 
+                note=tryNote(note, octave, duration);
+                drum = 9;
+                break;
+            case "0": 
+                note=tryNote(note, octave, duration);
+                drum = 0;
+                break;
+            case "\\": 
+                note=tryNote(note, octave, duration);
+                result = "";
+                break;
+            case "&":
+                note=tryNote(note, octave, duration);
+                result = "";
+                break;
+            case "<": 
+                note=tryNote(note, octave, duration);
+                result = "";
+                break;
+            case ">": 
+                note=tryNote(note, octave, duration);
+                result = "";
+                break;
+            default:
+                note=tryNote(note, octave, duration);
+                unknown = unknown + c;
+                break;
+        } //end of switch case
+  //alert(str.charAt(i)); //for debugging
+  } //end of musicText iterator
+  
+  note=tryNote(note, octave, duration);
+
+  //Encode sequence of notes to data stream.
+  var outputFile = wavChunk() + fmtChunk() + dataChunk();
+
+  //console.log(compareOutput); //for debugging
+
+  //Export to file option
+  if (action == 'export') {
+    download('file.wav', outputFile); 
+
+  }
+  else if (action == 'play') {
+    //Send to audio output
+    wavStream(outputFile);
+  }
+
+  //alert("view.byteLength = " + view.byteLength); //for debugging
+
+}
+
+// Convert each user-defined note into terms of frequency, octave, and duration.
+// Assume A4 = 440 hz
+// Remember, in terms of parsing the text, tryNote executes the "previous" note instead of the "current" note.
+function tryNote(note, octave, duration){
+  if (note!='') {
+    //console.log("Trying note " + note + ", octave " + octave + ", duration " + duration); //for debugging
+
+    for (var i = 0; i < note.length; i++) {
+      var c = note.charAt(i);
+      switch(c){ //}.toUpperCase()) {
+        case "C":
+            frequency = 261.6255653;
+            break;
+        case "D":
+            frequency = 293.6647679;
+            break;
+        case "E":
+            frequency = 329.6275569;
+            break;
+        case "F":
+            frequency = 349.2282314;
+            break;
+        case "G":
+            frequency = 391.995436;
+            break;
+        case "A":
+            frequency = 440;
+            break;
+        case "B":
+            frequency = 493.8833013;
+            break;
+        case "#":
+            frequency = frequency * 1.059463094;
+            break;
+        case "!":
+            frequency = frequency * 0.9438743127;
+            break;
+        case "X": 
+            frequency = 0;
+            break;
+      }
+    }
+    switch(octave){
+      case 9: 
+        frequency = frequency * 32;
+        break;
+      case 8: 
+        frequency = frequency * 16;
+        break;
+      case 7: 
+        frequency = frequency * 8;
+        break;
+      case 6: 
+        frequency = frequency * 4;
+        break;
+      case 5: 
+        frequency = frequency * 2;
+        break;
+      case 4:
+        frequency = frequency;
+        break;
+      case 3:
+        frequency = frequency / 2;
+        break;
+      case 2:
+        frequency = frequency / 4;
+        break;
+      case 1: 
+        frequency = frequency / 8;
+        break;
+      case 0: 
+        frequency = frequency / 16;
+        break;
+      case -1: 
+        frequency = frequency / 32;
+        break;
+      case -2: 
+        frequency = frequency / 64;
+        break;
+      default: 
+        console.log("Octave " + octave + " is out of scope. Defaulting to silence.");
+        frequency = 0;
+        break;
+    }
+    actualDuration = parseInt(quarterNoteDuration * duration); // the actual number of samples this note will occupy.
+
+    //console.log("Computing note frequency, actualDuration) //incomplete
+
+    // Compute note given frequency and exact duration.
+    computeNote();
+  }
+
+  return '';
+}
+
+// The purpose of this function is to append notes of a sequence together in such a way as to avoid gaps or jumps (discontinuities) in the data signal.
+// If you put all the notes together without "stitching" them together to make one continuous wave, you'll hear clicks and pops between each note.
+// To create a smooth sound, we start each new note at the same point the previous note left off.
+// It was very useful to view the waveforms with Audacity (audacityteam.org) when putting this together.
+function computeNote(){
+  //console.log("Computing frequency " + frequency + ", actual duration " + actualDuration + " samples"); //for debugging
+
+  //Make a data view from the buffer.
+  //8-bit samples are stored as unsigned bytes, ranging from 0 to 255. 16-bit samples are stored as 2's-complement signed integers, ranging from -32768 to 32767. 
+  //source: http://soundfile.sapp.org/doc/WaveFormat/
+  //8bit ==> uInt8 (unsigned)     16bit ==> Int16 (signed)
+  //Syntax: DataView.prototype.getUint8()   or .setUint8()
+  //Syntax: DataView.prototype.getInt16()   or .setInt16()
+
+  //The duration of the array will equal the number of bytes if 8-bit, otherwise it will be times two if 16-bit.
+  //var durationInBytes = 0;
+  //if (eightBit == true){
+  //    durationInBytes = actualDuration;
+  //  } else if (sixteenBit == true){
+  //    durationInBytes = actualDuration * 2;
+  //  }
+
+  //view = new DataView(buffer, xCursor); //xCursor is the offset in bytes
+
+  //var noteArray = new Int16Array(noteDuration); // deprecated
+
+  // As part of the process of "stitching" the waves of two different notes together,
+  // the program has to discern whether the curve is sloping up or down at the point one note-wave ends and a new one begins.
+  // We use xOffset in the trigonometric computation to determine the starting point of each consecutive wave/note.
+  var yOffset = global_y_Offset;
+  var xOffset = 0;
+  if (global_direction == "+") {
+    xOffset = 1;
+	}
+  else if (global_direction == "-") {
+    xOffset = -1;
+	}
+  else {
+    xOffset = 1;
+    }	
+	
+  //console.log(frequency, xOffset, yOffset); //for debugging
+  //var tmpCursor = xCursor; //deprecated
+  //var tmpLoop = xCursor + actualDuration;	//deprecated
+  //console.log("xCursor = " + xCursor); //for debugging
+
+  // Compute the wave (y) at each sample given (x).
+  for (x = 0; x < actualDuration; x++) {
+    
+    var c = computeWave(x, frequency, xOffset, yOffset);
+    //console.log(c + " = parseInt(computeWave(" + x + ", " + frequency + ", " + xOffset + ", " + yOffset + "))"); //for debugging
+    //noteArray[x] = c; // * v; //deprecated
+
+    //Write each value to its byte in the array buffer.
+    //View has not been advanced to xCursor, so this needs to be added to each (x).
+    //8-bit samples are stored as unsigned bytes, ranging from 0 to 255. 16-bit samples are stored as 2's-complement signed integers, ranging from -32768 to 32767. 
+    //source: http://soundfile.sapp.org/doc/WaveFormat/
+    if (eightBit == true){
+      d = parseInt(Math.round(c + 127.5)); //unsigned (0,255)
+      //console.log("Writing integer " + d + " to index " + (xCursor + x) + " in 8 bits."); //for debugging
+      view.setUint8(xCursor + x, d);
+      //console.log("Reading value at index " + (xCursor + x) + " in 8 bits = " + view.getUint8(xCursor + x)); //for debugging
+      //xCursor = xCursor + 1;
+    } else if (sixteenBit == true){
+      d = parseInt(Math.round(c)); //signed (-32768, 327767)
+      //console.log("Writing integer " + d + " to index " + (xCursor + (x * 2)) + " in 16 bits."); //for debugging
+      view.setInt16(xCursor + (x * 2), d); // Remember 16-bit arrays need two bytes per sample.
+      //console.log("Reading value at index " + (xCursor + (x * 2)) + " in 16 bits = " + view.getInt16(xCursor + (x * 2))); //for debugging
+      //xCursor = xCursor + 2; // Remember 16-bit arrays need two bytes per sample.
+    }
+  }
+
+  //Increment the buffer cursor to the end of the note that has been computed.
+  if (eightBit == true){
+   xCursor = xCursor + actualDuration;
+   xCursor = xCursor - 1; // Correct a discontinuity in the signal
+  } else if (sixteenBit == true){  
+   xCursor = xCursor + (actualDuration * 2); // Remember 16-bit arrays need two bytes per sample.
+   xCursor = xCursor - 2; // Correct a discontinuity in the signal
+  }
+
+  //console.log("xCursor = " + xCursor); //for debugging
+
+  // Derive computeWave(x) to determine whether the slope is positive or negative.
+  // Set global semaphores to start the consecutive note at the same point the previous note ended.
+  if (eightBit == true){
+    // global_direction = determineUpOrDown(view.getUint8(xCursor-1),view.getUint8(xCursor)); //noteArray[x-2], noteArray[x-1]); //deprecated
+    global_direction = deriveSlope(x, frequency, xOffset, yOffset);
+    //global_y_Offset = view.getUint8(xCursor-1) / bitDepth; //noteArray[x-1] / bitDepth; //deprecated
+    global_y_Offset = c / bitDepth;
+    //console.log("value at xCursor-2=" + (xCursor -2) + " is " + view.getUint8(xCursor-2));
+    //console.log("value at xCursor-1=" + (xCursor -1) + " is " + view.getUint8(xCursor-1));
+  } else if (sixteenBit == true){  
+    // global_direction = determineUpOrDown(view.getInt16(xCursor-2),view.getInt16(xCursor)); //noteArray[x-4], noteArray[x-2]); //deprecated
+    global_direction = deriveSlope(x, frequency, xOffset, yOffset);
+    //global_y_Offset = view.getInt16(xCursor-2) / bitDepth; //noteArray[x-2] / bitDepth; //deprecated
+    global_y_Offset = c / bitDepth;
+    //console.log("value at xCursor-5=" + (xCursor -5) + " is " + view.getInt16(xCursor-5));
+    //console.log("value at xCursor-4=" + (xCursor -4) + " is " + view.getInt16(xCursor-4)); //these are the correct values.
+    //console.log("value at xCursor-3=" + (xCursor -3) + " is " + view.getInt16(xCursor-3));
+    //console.log("value at xCursor-2=" + (xCursor -2) + " is " + view.getInt16(xCursor-2)); //these are correct
+    //console.log("value at xCursor-1=" + (xCursor -1) + " is " + view.getInt16(xCursor-1));
+  }
+  //console.log('slope ' + global_direction); //debugging
+  //console.log('offset=' + global_y_Offset + '; asin(offset)=' + Math.asin(global_y_Offset)); //debugging
+  //return noteArray; //deprecated
+
+}
+
+// Compute the waveform at x=i given frequency, bit depth, and curve-connecting offsets.
+function computeWave(i, frequency, xOffset, yOffset) {
+  //var a = (Math.sin(((Math.PI * 2 * i * frequency) + (Math.asin(yOffset) * samplingRate) ) / samplingRate) ) * bitDepth; //deprecated
+  var a = (Math.sin(((Math.PI * 2 * i * frequency) + (xOffset * (Math.asin(yOffset) * sampleRate))) / sampleRate) ) * xOffset * bitDepth; 
+  //console.log(a + " = (Math.sin(((Math.PI * 2 * " + i + " * " + frequency + ") + (" + xOffset + "* (Math.asin(" + yOffset + ") * " + sampleRate + "))) / " + sampleRate + ") ) * " + xOffset + " * " + bitDepth + "; )"); //for debugging
+  return a * volumeMultiplier;
+}
+
+
+// I had a bone-headed realization when I was trying to figure out the slope of the curve at X:
+// "Oh yeah, that thing I studied for four years in math class!" 
+// This function replaces determineUpOrDown(), taking the derivative of our wave synthesis computeWave() function, which is the cosine of the same function.
+// If it's positive, then the slope is positive;
+// if it's negative, then the slope is negative;
+// and if it equals zero, then we take the derivative of the derivative, which is -sin of computeWave.
+function deriveSlope(i, frequency, xOffset, yOffset) {
+  var d = (Math.cos(((Math.PI * 2 * i * frequency) + (xOffset * (Math.asin(yOffset) * sampleRate))) / sampleRate) ) * xOffset * bitDepth; 
+  var dir = "";
+  if (d > 0) {
+    dir = "+";
+  }
+  else if (d < 0) {
+    dir = "-";
+  }
+  else if (d == 0) { 
+    var e = -1 * ((Math.sin(((Math.PI * 2 * i * frequency) + (xOffset * (Math.asin(yOffset) * sampleRate))) / sampleRate) ) * xOffset * bitDepth); 
+    if (e > 0) {
+      dir = "+";
+    }
+    else if (e < 0) {
+      dir = "-";
+    }
+  }
+  return dir;
+}
+
+
+// Deprecated. Keeping for posterity, but don't show this to my calculus teacher!
+// Find whether a curve is sloping upwards or downwards given two samples.
+// Sometimes with 8-bit waves, there are two adjacent samples with equal values,
+// causing the wave to "flip" to the other direction
+// (or if both samples equal zero.)
+// This could be fixed by comparing three or more samples, or by using 16-bit samples instead.
+//function determineUpOrDown(a, b) {
+//  var dir = "";
+//  if (b > a) { // if the last two samples in the note are increasing, then the curve is going up.
+//	dir = "+";
+//  }
+//  else if (b < a) { // if the last two samples in the note are decreasing, then the curve is going down.
+//	dir = "-";
+//  }
+//  else if (a == b) { //If there is no curve, chances are the point is at the top or bottom of a curve,
+//	if (a > 0) { // so if it's above zero then the curve is probably going downward
+//	  dir = "-";
+//	}
+//	else if (a < 0) { // and if it's below zero then the curve is probably going upward
+//	  dir = "+";
+//	}
+//  }
+//  //console.log("a=" + a + ", b=" + b + ", dir=" + dir); //debugging
+//  //console.log("Comparing curve slope: (" + a + ", " + b + "), result = " + dir); //debugging
+//
+//  return dir;
+//}
+
+// Preliminary volume-shaping function
+//
+//function volumeShape(i, duration) {
+//  var v = (Math.cos(Math.PI * i / duration * .5));
+//  return v;
+//}
+
+//
+// Deprecated
+//
+//function Wave(i, frequency, xOffset, yOffset) {
+ // //var a = (Math.sin(((Math.PI * 2 * i * frequency) + (Math.asin(yOffset) * samplingRate) ) / samplingRate) ) * bitDepth; 
+ // var a = (Math.sin(((Math.PI * 2 * i * frequency) + (xOffset * (Math.asin(yOffset) * samplingRate))) / samplingRate) ) * xOffset * bitDepth; 
+ // return a;
+//}
+
+
+// Stream to computer audio
+function wavStream(data) {
+  var pom = document.createElement('audio');
+  pom.setAttribute('autoplay', 'autoplay');
+  pom.setAttribute('src', 'data:audio/wav;charset=utf-8,' + data);
+
+  //Deprecated
+  //if (document.createEvent) {
+  //  var event = document.createEvent('MouseEvents');
+  //  event.initEvent('click', true, true);
+  //  pom.dispatchEvent(event); }
+  //else {
+  //  pom.click(); } 
+}
+
+
+// WAVE chunk
+// This function is part of what encodes the audio wave signal to streaming/file format. 
+// integerToByte_LittleEndian returns a 2-Byte little-endian integer.
+// integerTo4Byte_LittleEndian returns 4 bytes etc.
+function wavChunk() {
+  var ChunkID = textTo4Byte_BigEndian("RIFF");
+  //if 8bit, byte length is xCursor.
+  //if 16bit, byte length is xCursor * 2.
+  if (eightBit == true){
+    var byteLength = xCursor;
+  } else if (sixteenBit == true){  
+    var byteLength = xCursor * 2;
+  }
+  var ChunkSize = integerTo4Byte_LittleEndian(36 + byteLength);
+  var Format = textTo4Byte_BigEndian("WAVE");
+  return (ChunkID + ChunkSize + Format);
+}
+
+// FORMAT chunk
+// This function is part of what encodes the audio wave signal to streaming/file format. 
+function fmtChunk() {
+  var Subchunk1ID = textTo4Byte_BigEndian("fmt ");
+  var Subchunk1Size = integerTo4Byte_LittleEndian(16); //PCM
+  var AudioFormat = integerToByte_LittleEndian(1); //Uncompressed
+  var NumChannels = integerToByte_LittleEndian(numchannel); //Mono
+  var SampleRate = integerTo4Byte_LittleEndian(sampleRate); // samplingRate
+  var ByteRate = integerTo4Byte_LittleEndian(sampleRate * numchannel * (bitsPerSample/8)); //SamplingRate * NumChannels
+  var BlockAlign = integerToByte_LittleEndian(numchannel * (bitsPerSample/8));
+  var bitsPerSampleEncoded = integerToByte_LittleEndian(bitsPerSample);
+  return(Subchunk1ID + Subchunk1Size + AudioFormat + NumChannels + SampleRate + ByteRate + BlockAlign + bitsPerSampleEncoded);
+}
+
+
+// DATA chunk
+// This function is part of what encodes the audio wave signal to streaming/file format. 
+function dataChunk() {
+  var Subchunk2ID = textTo4Byte_BigEndian("data");
+  if (eightBit == true){
+    var byteLength = xCursor;
+  } else if (sixteenBit == true){  
+    var byteLength = xCursor * 2;
+  }
+  var Subchunk2Size = integerTo4Byte_LittleEndian(byteLength * numchannel * (bitsPerSample/8)); //# of bytes in the array
+  //alert("DT length=" + dt.length);
+  //var Data = signedInt16ArrayToUnsigned(dt);
+
+  //var returnStr  = '';
+  if (eightBit == true){
+    var Data = new Uint8Array(buffer, 0, xCursor);
+    var Data2 = Uint8ArrayToHex(Data);
+  } else if (sixteenBit == true){  
+    //var Data = new Int16Array(buffer, 0, (xCursor * 2));
+    var Data2 = Int16ArrayToHex(view);
+  }
+
+  return(Subchunk2ID + Subchunk2Size + Data2);
+}
+
+// A Memo on Format Conversion and Byte Endianness in JavaScript
+
+// It is inefficient to convert the data buffer into a URI-encoded hexadecimal string,
+// but browsers do not seem to allow direct streaming of the data buffer to output.
+// This appears to be a tradeoff of writing a music synthesizer in JavaScript instead of C/C++ or .NET.
+// If you know a way to send the data view directly to the output stream without re-encoding it, I would certainly love to hear about it!
+
+// According to MDN, "with a DataView you are able to control the byte-order.
+// It is big-endian by default and can be set to little-endian in the getter/setter methods."
+// I have yet to get this built-in functionality to work, so I wrote functions to do it manually instead.
+
+// I am sure there is a better way to convert byte arrays to hexadecimal format,
+// but at the time I was writing this program I couldn't find any,
+// so here are the manual conversion functions.
+
+////////////////////////////////////////////////////////////////
+
+// Convert a signed 16-bit array to unsigned 16-bit integers,
+// then to hexadecimal byte format.
+//
+function signedInt16ArrayToUnsigned(arr) {
+  var returnString = "";
+  for (i = 0; i < arr.length; i++) {
+    sample = arr[i];
+    if (sample >= 0) {
+      var r = integerToByte_LittleEndian(sample); }
+    else if (sample < 0) {
+      sample = sample + 65536; // (16^4)
+      var r = integerToByte_LittleEndian(sample); }
+    returnString = returnString.concat(r); }
+  return returnString; }
+
+//
+// Convert a signed 16-bit array to hexadecimal byte format.
+//
+function Int16ArrayToHex() {
+    //console.log("Int16ArrayToHex");
+  var returnString = "";
+  for (i = 0; i < xCursor; i=i+2) {
+    sample = view.getInt16(i);
+    if (sample >= 0) {
+      //var r = integerToByte_LittleEndian(sample); }
+    }
+    else if (sample < 0) {
+      sample = sample + 65536; // (16^4) // Two's Complement
+      //var r = integerToByte_LittleEndian(sample); }
+    }
+    var r = int16ToBytes_LittleEndian(sample);
+    returnString = returnString.concat(r); 
+    //compareOutput = compareOutput.concat("[" + i + "," + view.getInt16(i) + "]");
+  }
+  return returnString; 
+}
+
+//
+function Uint8ArrayToHex(arr) {
+    //console.log("Uint8ArrayToHex");
+    var returnString = "";
+    for (i = 0; i < arr.length; i++) {
+      sample = arr[i];
+      var r = Uint8ToByte_LittleEndian(sample);
+      returnString = returnString.concat(r); 
+      //compareOutput = compareOutput.concat("[" + i + "," + arr[i] + "]");
+    }
+  return returnString; 
+}
+
+// Convert one 16-bit integer to hexadecimal bytes, big-endian,
+// and append leading %s for the URI stream encoding.
+function integerToByte_BigEndian(s) {
+  var doubleCheck = s;
+  var int4 = s % 16;
+  s = parseInt(s / 16);
+  var int3 = s % 16;
+  s = parseInt(s / 16);
+  var int2 = s % 16;
+  s = parseInt(s / 16);
+  var int1 = s % 16;
+  s = parseInt(s / 16); 
+  //
+  // Make sure the hexadecimal-converted value equals the original value.
+  //if (doubleCheck != validate(int1, int2, int3, int4)) {
+  //  alert("Failure: integerToByte_BigEndian(" + s + ") != " + validate(int1, int2, int3, int4) + "."); }
+  //
+  return "%" + intToHex(int1) + intToHex(int2) + "%" + intToHex(int3) + intToHex(int4); }
+
+//
+// Convert one 16-bit integer to hexadecimal bytes, little-endian,
+// and append leading %s for the URI stream encoding.
+function integerToByte_LittleEndian(s) {
+  var doubleCheck = s;
+  var int1 = s % 16;
+  s = parseInt(s / 16);
+  var int2 = s % 16;
+  s = parseInt(s / 16);
+  var int3 = s % 16;
+  s = parseInt(s / 16);
+  var int4 = s % 16;
+  s = parseInt(s / 16); 
+  return "%" + intToHex(int2) + intToHex(int1) + "%" + intToHex(int4) + intToHex(int3); }
+
+function Uint8ToByte_LittleEndian(s) {
+  var doubleCheck = s;
+  var int1 = s % 16;
+  s = parseInt(s / 16);
+  var int2 = s % 16;
+  s = parseInt(s / 16);
+  //console.log(":" + doubleCheck + " --> " + int2 + ", " + int1);
+  return "%" + intToHex(int2) + intToHex(int1); }
+
+function int16ToBytes_LittleEndian(s) {
+  var doubleCheck = s;
+  var int1 = s % 16;
+  s = parseInt(s / 16);
+  var int2 = s % 16;
+  s = parseInt(s / 16);
+  var int3 = s % 16;
+  s = parseInt(s / 16);
+  var int4 = s % 16;
+  s = parseInt(s / 16); 
+  //console.log(":" + doubleCheck + " --> " + int2 + ", " + int1 + ", " + int4 + ", " + int3);
+  return "%" + intToHex(int2) + intToHex(int1) + "%" + intToHex(int4) + intToHex(int3); }
+
+// Data chunks are 4 bytes
+// Convert one 16-bit integer to hexadecimal bytes, little-endian,
+// and append leading %s for the URI stream encoding.
+function integerTo4Byte_LittleEndian(s) {
+  //var doubleCheck = s;
+  var int1 = s % 16;
+  s = parseInt(s / 16);
+  var int2 = s % 16;
+  s = parseInt(s / 16);
+  var int3 = s % 16;
+  s = parseInt(s / 16);
+  var int4 = s % 16;
+  s = parseInt(s / 16); 
+  var int5 = s % 16;
+  s = parseInt(s / 16);
+  var int6 = s % 16;
+  s = parseInt(s / 16);
+  var int7 = s % 16;
+  s = parseInt(s / 16);
+  var int8 = s % 16;
+  s = parseInt(s / 16); 
+  return "%" + intToHex(int2) + intToHex(int1) + "%" + intToHex(int4) + intToHex(int3)  
+  + "%" + intToHex(int6) + intToHex(int5) + "%" + intToHex(int8) + intToHex(int7);
+  }
+
+// Convert an integer in the range [0,15] to hexadecimal.
+function intToHex(n) {
+  if (n < 10) {
+    if (n >= 0) {
+      return n.toString(); }
+    else { console.log("Error: intToHex(" + n + ")"); } }
+  switch (n) {
+    case 10:
+      var r = "a";
+      break;
+    case 11:
+      var r = "b";
+      break;
+    case 12:
+      var r = "c";
+      break;
+    case 13:
+      var r = "d";
+      break;
+    case 14:
+      var r = "e";
+      break;
+    case 15:
+      var r = "f";
+      break;
+    default:
+      console.log("Error: intToHex(" + n + ")");
+      break; }
+  return r; }
+  
+//
+// Send the data in a URI stream to a downloadable file.
+// Source: https://stackoverflow.com/questions/2897619/using-html5-javascript-to-generate-and-save-a-file  
+//
+function download(filename, data) {
+  var pom = document.createElement('a');
+  pom.setAttribute('href', 'data:audio/wav;charset=utf-8,' + data);
+  pom.setAttribute('download', filename);
+  if (document.createEvent) {
+    var event = document.createEvent('MouseEvents');
+    event.initEvent('click', true, true);
+    pom.dispatchEvent(event); }
+  else {
+    pom.click(); } }
+
+//File format blocks are two to four bytes.
+//Convert a 4-character string to 4 bytes, big-endian
+//Insert % sign for URI encoding.
+function textTo4Byte_BigEndian(t) {
+  t3 = t.charCodeAt(3);
+  t2 = t.charCodeAt(2);
+  t1 = t.charCodeAt(1);
+  t0 = t.charCodeAt(0);
+  
+  //console.log(t3 + ';' + t2 + ';' + t1 + ';' + t0);
+
+  var int8 = t3 % 16;
+  t3 = parseInt(t3 / 16);
+  var int7 = t3 % 16;
+  t3 = parseInt(t3 / 16);
+  var int6 = t2 % 16;
+  t2 = parseInt(t2 / 16);
+  var int5 = t2 % 16;
+  t2 = parseInt(t2 / 16); 
+  var int4 = t1 % 16;
+  t1 = parseInt(t1 / 16);
+  var int3 = t1 % 16;
+  t1 = parseInt(t1 / 16);
+  var int2 = t0 % 16;
+  t0 = parseInt(t0 / 16);
+  var int1 = t0 % 16;
+  t0 = parseInt(t0 / 16); 
+  
+  return "%" + intToHex(int1) + intToHex(int2) + "%" + intToHex(int3) + intToHex(int4) 
+  + "%" + intToHex(int5) + intToHex(int6) + "%" + intToHex(int7) + intToHex(int8); 
+}
+
+//Verify an unsigned byte computes back to the correct integer (for debugging)
+//function validate(w,x,y,z) {
+//  var w = w * 16 * 16 * 16;
+//  var x = x * 16 * 16;
+//  var y = y * 16;
+//  return w + x + y + z; }
+
+// A function that draws the waveform onto an HTML5 canvas (Needs to be updated)
+//function drawWave() {
+//  brush.beginPath();
+//  brush.lineWidth = '1';
+//  var lineLength = lpcm16.length;
+//  var delta = lineLength / canWidth;
+//  brush.moveTo(0, canHeight + lpcm16[0]);
+//  for (x = 0; x < canWidth; x++) {
+//    var dx = parseInt(x * delta);
+//    var drawX = x;
+//    var drawY = parseInt((lpcm16[dx] / bitDepth) * canHeight) + canHeight;
+//    brush.lineTo(drawX, drawY);
+//    //alert(x + ':' + dx + ': (' + drawX + ', ' + drawY + ')');
+//  } 
+//  brush.stroke();
+//}
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+
+</script>

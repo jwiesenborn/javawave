@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Diet Pumpkin Machine</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>Data Encoding</h1>
+  <p>8/7/2018</p>
+  <p>The purpose of this script is to store encoded data. It will be necessary to have byte-level control over the charset and encoding. What data structures can we use to encode OggPCM data?</p>
+  <h2>ArrayBuffers</h2>
+  <p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays</a></p>
+  <h2>BLOBs</h2>
+  <p>"A blob has its size and MIME type just like a file has." "A blob can be used like a file wherever we use files." "[S]ynchronous versions of APIs are also available so that they can be used in Web Workers." [multi-threading] "Content of a blob can be read as ArrayBuffer and therefore it makes blobs very handy to store binary data" according to <a href="http://qnimate.com/an-introduction-to-javascript-blobs-and-file-interface/">a weblog</a>.</p>
+  <h2>What is a MIME type?</h2>
+  <p>"The Multipurpose Internet Mail Extensions (MIME) type is a standardized way to indicate the nature and format of a document." "Browsers often use the MIME type [...] to determine how it will process a document; it is therefore important that servers are set up correctly to attach the correct MIME type to the header of the response object."</p>
+  <p>According to <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types">MDN</a> this value is "audio/ogg".
+  <h2>TypedArrays</h2>
+  <p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray</a></p>
+</div>
+</body>
+</html>

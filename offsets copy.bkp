@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>WimpyCat</title>
+  <title>Diet Pumpkin Machine</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -56,10 +56,10 @@
 <div class="container-fluid">
   <div class="row content">
     <div class="col-sm-3 sidenav">
-      <h4>WimpyCat: 8-bit Music Player</h4>
+      <h4>Diet Pumpkin Machine</h4>
       <ul class="nav nav-pills nav-stacked">
         <li><a href="index.htm">Home</a></li>
-        <li><a href="theory.htm">Hypothesis</a></li>
+        <li><a href="theory.htm">Computer Music Theory</a></li>
         <li><a href="program.htm">Example Program</a></li>
         <li><a href="harmony.htm">Harmonic Computation</a></li>
         <li><a href="frequency.htm">The Frequency Equation</a></li>
@@ -68,34 +68,29 @@
         <li><a href="tone.htm">Tone</a></li>
         <li><a href="sequences.htm">Sequences</a></li>
         <li><a href="wave.htm">The WAV format</a></li>
-        <li><a href="offsets.htm">Offsets (Sequences Part 2)</a></li>
-        <li><a href="musicxml.htm">MusicXML</a></li>
-        <li><a href="synthesis.htm">Synthesis</a></li>
-        <li><a href="a_sigh.htm">A Sigh</a></li>
-        <li class="active"><a href="2019-05-26.htm">Streaming</a></li>
-        <li><a href="player.htm">Player</a></li>
+        <li class="active"><a href="offsets.htm">Offsets (Sequences Part 2)</a></li>
       </ul><br>
     </div>
 
     <div class="col-sm-9">
-      <h4><small>STREAMING</small></h4>
+      <h4><small>OFFSETS</small></h4>
       <hr>
-      <h3>Streaming</h3>
-      <p><h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 26 May 2019</h5></p>
-      <p>Today I looked up how I might stream the WAV data in the web browser instead of download as a file, which took me to <a href="https://stackoverflow.com/questions/1175448/best-way-to-play-wav-files-in-the-browser">StackOverflow</a> and then to <a href="https://www.w3schools.com/html/html5_audio.asp">w3schools</a>. I changed the parameters of the file download function I had been using to match the HTML5 audio element. It turns out that we only need three new lines of code to stream the audio. Surprisingly, the stream is <i>more</i> compatible than the download, working in Firefox, Chrome, Safari, and Edge.</p>
-      <p><code>function wavStream(data) {<br/> 
-      var pom = document.createElement('audio');<br/> 
-      pom.setAttribute('autoplay', 'autoplay');<br/> 
-      pom.setAttribute('src', 'data:audio/wav;charset=utf-8,' + data);<br/> 
-      }<br/> </code></p>
-	  <p><button onclick='dietCalc()'>Test</button></p>
-
+      <h3>Offsets (Sequences, Part 2)</h3>
+      <p><h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 30 March 2019</h5></p>
+      <p>When we put together a sequence of different notes, at first we may notice 'clicks' or 'pops' between each note. We have to zoom in on the graph to find out the reason. It turns out these blips are discontinuities where notes change frequency in our mathematical equation:</p>
+	  <p>y = (sin( (2&pi;x &bull; &#402;) / &rho;) ) &bull; &beta;
+	  <p><center><img src="discontinuity.png" width='532' height='100'/></center></p>
+	  <p>To correct this discontinuity, we must adjust our calculation to begin each note where the previous one left off. In the following equation, we compute the vertical offset <i>yOffset</i> from the arcsine of the endpoint of the previous note. Horizontal offset <i>xOffset</i> is a binary semaphore indicating whether the previous note was ascending (1) or descending (-1) when it stopped.</p>
+	  <p>y = (sin( ( (2&pi;x &bull; &#402;) + (xOffset &bull; (arcsin(yOffset) &bull; &rho;) ) ) / &rho;) ) &bull; xOffset &bull; &beta;</p>
+	  <p><center><img src="continuity.png" width='532' height='100'/></center></p>
+	  <p><button onclick='dietCalc()'>Download</button> *Requires the latest version of Mozilla Firefox</p>
+	  <p><center>&rho; = Sample Rate (44,100)</center></p>
+	  <p><center>&beta; = Bit Rate (65,535 / 2)</center></p>
+	  <p><center>&#402; = Frequency in Hertz</center></p>
     </div>
   </div>
 </div>
 
-<footer class="container-fluid">
-  <p>Jesse Wiesenborn | <a href="https://github.com/jwiesenborn/javawave">GitHub</a></p>
 </body>
 </html>
 
@@ -106,10 +101,10 @@
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-// title: streaming
+// title: sequences 2
 // author: jesse wiesenborn
-// date: 5/26/2019
-// version 0.12
+// date: 3/30/2019
+// version 0.6
 
 // Global constants and objects
 var samplingRate = 44100; // samples per second
@@ -123,7 +118,7 @@ var numchannel = 1;
 var global_y_Offset = 0.000000; //vertical offset between notes
 var global_direction = ""; //plus-or-minus semaphore
 //
-// Calculate an ascending A scale in a signed
+// Calculate a two-second A triad in a signed
 // 16-bit array, then save it to a PCM data file.
 //
 function dietCalc() {
@@ -155,23 +150,8 @@ function dietCalc() {
 
   
   var outputFile = wavChunk(lpcm16.length) + fmtChunk() + dataChunk(lpcm16);
-  //download('test.wav', outputFile); 
-  wavStream(outputFile);
+  download('song1.wav', outputFile); 
   
-}
-
-//Test
-function wavStream(data) {
-  var pom = document.createElement('audio');
-  pom.setAttribute('autoplay', 'autoplay');
-  pom.setAttribute('src', 'data:audio/wav;charset=utf-8,' + data);
-
-  //if (document.createEvent) {
-  //  var event = document.createEvent('MouseEvents');
-  //  event.initEvent('click', true, true);
-  //  pom.dispatchEvent(event); }
-  //else {
-  //  pom.click(); } 
 }
 
 //compute one note given the parameters Frequency and Duration
@@ -442,7 +422,7 @@ function intToHex(n) {
 //
 function download(filename, data) {
   var pom = document.createElement('a');
-  pom.setAttribute('href', 'data:audio/wav;charset=utf-8,' + data);
+  pom.setAttribute('href', 'data:audio/pcm;charset=utf-8,' + data);
   pom.setAttribute('download', filename);
   if (document.createEvent) {
     var event = document.createEvent('MouseEvents');

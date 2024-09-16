@@ -33,7 +33,22 @@
       .row.content {height: auto;} 
     }
     
+    /* Tab code from https://www.computerhope.com/issues/ch001034.htm */
+    .tab1 { margin-left: 2em; }
+    .tab2 { margin-left: 4em; }
+    .tab3 { margin-left: 6em; }
+    
+    .codebox {
+    font-family: monospace;
+    font-size: 9pt;
+    color: blue;
+    background-color: cornsilk;
+    width: 70%;
+    border: 1px;
+    }
+
 }
+    
   </style>
 </head>
 <body>
@@ -43,7 +58,7 @@
     <div class="col-sm-3 sidenav">
       <h4>WimpyCat: 8-bit Music Player</h4>
       <ul class="nav nav-pills nav-stacked">
-        <li class="active"><a href="index.htm">Home</a></li>
+        <li><a href="index.htm">Home</a></li>
         <li><a href="theory.htm">Hypothesis</a></li>
         <li><a href="program.htm">Example Program</a></li>
         <li><a href="harmony.htm">Harmonic Computation</a></li>
@@ -56,29 +71,29 @@
         <li><a href="offsets.htm">Offsets (Sequences Part 2)</a></li>
         <li><a href="musicxml.htm">MusicXML</a></li>
         <li><a href="synthesis.htm">Synthesis</a></li>
-        <li><a href="a_sigh.htm">A Sigh</a></li>
+        <li class="active"><a href="a_sigh.htm">A Sigh</a></li>
         <li><a href="2019-05-26.htm">Streaming</a></li>
         <li><a href="player.htm">Player</a></li>
       </ul><br>
     </div>
 
     <div class="col-sm-9">
-      <h4><small>WimpyCat</small></h4>
+      <h4><small>A SIGH</small></h4>
       <hr>
-      <h3>Update</h3>
-      <h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 16 September 2024</h5>
-      <p>This website is a blog cataloging my development of a program that mathematically computes sine waves and plays them back in your browser as music. I started the idea as my "Capstone" project at NDSU and then I kept working on it after I finished school. You can navigate through these posts with the menu on the left side of this window, or you can jump ahead to the latest version of the application <a href="player.htm">here</a>.<br><br>Thanks for checking it out!<br><br> - Jess</p>
-      <br><br>
-      <h3>Introduction</h3>
-      <h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 2019</h5>
-      <p>Let us bridge the gap between music and mathematics using the power of computer science. Here we will define concepts of rhythm, timbre, melody, and harmony in terms of computer language, and we will use computer programs to express mathematical ideas in sound.</p>
+      <h3>A Sigh</h3>
+      <p><h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 14 May 2019</h5></p>
+      <p>Today I added more precision to the frequencies and modulated the amplitude. <a href="https://drive.google.com/file/d/1FLYoQhnziaIOQyVk6C2cBXzED0FjmaB6/view?usp=sharing"><u>Then I sang the words along with it.</u></a></p>
+      <p><A href="https://drive.google.com/file/d/1BHE_t1nIgXpYtA9lvibXRHeJ4ShP3wsu/view?usp=sharing"><u>Accompaniment</u></a> - What you hear in this file is the work of music transposed into a mathematical equation.</p>
+      <p><a href="synth09.js">Source code</a></p>
+      <p>Thank-you to <a href='https://kylevanderburg.com/'>Kyle Vanderburg</a>, Jamie Parsley, OpenSheetMusicDisplay, NDSU, and everyone else!</p>
+      
     </div>
   </div>
 </div>
 
 <footer class="container-fluid">
   <p>Jesse Wiesenborn | <a href="https://github.com/jwiesenborn/javawave">GitHub</a></p>
-</footer>
-
 </body>
 </html>
+
+</script>

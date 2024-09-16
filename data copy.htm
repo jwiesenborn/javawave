@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Diet Pumpkin Machine</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+    .row.content {height: 720px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height: auto;} 
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav">
+      <h4>Diet Pumpkin Machine</h4>
+      <ul class="nav nav-pills nav-stacked">
+        <li><a href="index.htm">Home</a></li>
+        <li><a href="pcm.htm">Pulse Code Modulation</a></li>
+        <li><a href="demo.htm">Demo</a></li>
+      </ul><br>
+    </div>
+
+    <div class="col-sm-9">
+      <h4><small>ENCODING</small></h4>
+      <hr>
+      <h3>PCM demo 1</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by jesse, Aug 22, 2018.</h5>
+      <p><a href="demo.htm">PCM demo 0.1</a></p>
+      <h3>The Matroska container</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by jesse, Aug 19, 2018.</h5>
+      <p>So there isn't an official specification for PCM data after all. I have been able to encode it in the RIFF/WAVE container in previous work, but this specification is owned by Microsoft. I did some more research and found the open format <A href="https://www.matroska.org/technical/index.html">Matroška</a> (.MKA) supports PCM data. To encode these files I have to write headers in Extensible Binary Meta Language, which isn't really something I want to spend the rest of my day with. I need to focus on getting some actual real data constructed. Let's start over and focus on generating some raw PCM data to <a href="https://github.com/watsonbox/pocketsphinx-ruby/wiki/Importing-raw-PCM-audio-with-Audacity">import into Audacity</a> for playback. Signed 16-bit little-endian sounds easy enough.</p>
+      <h3>PCM containers</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by jesse, Aug 18, 2018.</h5>
+      <p>As I began working on the PCM data packet encoding, I realized that Ogg is not an official container for PCM data. I may have to play back the raw PCM data with something like the VLC media player <!-- vlc --demux=rawaud --rawaud-channels 2 --rawaud-samplerate 48000 my_file.pcm --><!-- https://forum.videolan.org/viewtopic.php?t=44726 -->or perhaps <a href="https://github.com/samirkumardas/pcm-player">this online pcm-player</a>. The <a href="https://matroska.org/technical/specs/index.html">Matroška</a> container should be able to handle it. Failing that, I will fall back to the RIFF/WAVE container because I know that works.</p>
+      <h3>Encoding the comment packet</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by jesse, Aug 14, 2018.</h5>
+      <p>The draft on the Xiph website I had been working from doesn't define the vorbis comment packet, but the <a href="https://xiph.org/vorbis/doc/v-comment.html">Vorbis I specification</a> does. Zero fields keep it simple for this test. The next iteration should store the comment fields in a string array, and loop through the set to identify and encode each field length. In the compiled packet, each field length value will precede the string field.</p>
+      <p><code>
+	// title: OggPCM comment header
+	<br/>// author: Jesse Wiesenborn
+	<br/>// date: 8/14/2018
+	<br/>// version 0.1
+	<br/>
+	<br/>const vendorString = 'dietpumpkinmachine.com';
+	<br/>
+	<br/>const vendorStringLength = new Uint32Array(0); 
+	<br/>vendorStringLength[0] = vendorString.length;
+	<br/>
+	<br/>const numberOfCommentFields = new Uint32Array(0);
+	<br/>numberOfCommentFields[0] = 0;
+	<br/>
+	<br/>//for each field N in commentArray {
+	<br/>//  const commentFieldN = 'FIELD=Value';
+	<br/>//  const commentFieldNLength = new Uint32Array(0);
+	<br/>//  commentFieldNLength[0] = commentFieldN.length;
+	<br/>//}
+	</code>
+      <h3>Encoding OggPCM headers with ECMAScript TypedArrays</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by jesse, Aug 13, 2018.</h5>
+      <p>The following constants define the main header packet for OggPCM. Using single-element TypedArrays may be unconventional, but they are the only strongly-typed data structures available with ECMAScript.</p>
+      <p>
+      	<code>// title: OggPCM main header
+	<br/>// author: Jesse Wiesenborn
+	<br/>// date: 8/13/2018
+	<br/>// version 0.1
+        <br/>
+        <br/>const codecIdentifier = "PCM     ";
+        <br/>
+	<br/>const versionMajor = new Uint16Array(0);
+	<br/>versionMajor[0] = 0;
+	<br/>
+	<br/>const versionMinor = new Uint16Array(0);
+	<br/>versionMinor[0] = 1;
+	<br/>
+	<br/>const PCMformat = new Uint32Array(0);
+	<br/>PCMformat[0] = 3; //Signed integer 16 bit big endian
+	<br/>
+	<br/>const samplingRate = new Uint32Array(0);
+	<br/>samplingRate[0] = 44100;
+	<br/>
+	<br/>const numberOfSignificantBits = new Uint8Array(0);
+	<br/>numberOfSignificantBits[0] = 0; //defaults to specified bit width.
+	<br/>
+	<br/>const numberOfChannels = new Uint8Array(0); 
+	<br/>numberOfChannels[0] = 1; // (< 256)
+	<br/>
+	<br/>const maximumNumberOfFramesPerPacket = new Uint16Array(0);
+	<br/>maximumNumberOfFramesPerPacket[0] = 0; //0 means 65536 max
+	<br/>
+	<br/>const numberOfExtraHeaderPackets = new Uint32Array(0);
+	<br/>numberOfExtraHeaderPackets[0] = 0;
+	</code></p>
+	<p>Data types found at <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">Mozilla Development Network</a>
+	</p>
+      <h3>PCM data formats</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by jesse, Aug 11, 2018.</h5>
+      <p>Here's a rough draft for <a href="https://wiki.xiph.org/index.php?title=OggPCM&mobileaction=toggle_view_desktop">OggPCM formatting</a>. I want to try coding into this first because it's a non-proprietary format.</p>
+      <p>I've previously made output based on <a href="http://soundfile.sapp.org/doc/WaveFormat/">this writeup</a> of the WAVE file specification, and may fall back on this if OggPCM doesn't work out.</p>
+      <h3>Encoding signals</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by jesse, Aug 1, 2018.</h5>
+      <p>The purpose of this program is to encode signals in PCM format. It will be necessary to have byte-level control over the character set and binary encoding. What data structures can we use to encode PCM data?</p>
+      <h4>ArrayBuffers</h4>
+      <p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays</a></p>
+      <h4>BLOBs</h4>
+      <p>"A blob has its size and MIME type just like a file has." "A blob can be used like a file wherever we use files." "[S]ynchronous versions of APIs are also available so that they can be used in Web Workers." [multi-threading] "Content of a blob can be read as ArrayBuffer and therefore it makes blobs very handy to store binary data" according to <a href="http://qnimate.com/an-introduction-to-javascript-blobs-and-file-interface/">a weblog</a>.</p>
+      <h4>What is a MIME type?</h4>
+      <p>"The Multipurpose Internet Mail Extensions (MIME) type is a standardized way to indicate the nature and format of a document." "Browsers often use the MIME type [...] to determine how it will process a document; it is therefore important that servers are set up correctly to attach the correct MIME type to the header of the response object."</p>
+      <p>According to <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types">MDN</a> this value for our purposes is "audio/ogg".
+      <h4>TypedArrays</h4>
+      <p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray</a></p>
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid">
+  <p>Jesse Wiesenborn</p>
+</footer>
+
+</body>
+</html>
+
+<script>
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+// title: PCM synthesis demo
+// author: Jesse Wiesenborn
+// date: 8/21/2018
+// version 0.1
+//
+// Synthesize a ten-second wave at 441 Hz in an unsigned
+// linear 16-bit array, then save it to a file.
+
+function demo1() {
+  var samplingRate = 44100;
+  var bitDepth = 65535 / 2;
+  var frequency = 441;
+  var durationInSeconds = 10;
+  var lpcm16 = new Int16Array(samplingRate * durationInSeconds);
+  for (i = 0; i < lpcm16.length; i++) {
+    lpcm16[i] = Math.sin((Math.PI * 2 * i * frequency) / samplingRate) * bitDepth; }
+  download('demo01.pcm',signedInt16ArrayToHex(lpcm16)); }
+
+function signedInt16ArrayToHex(arr) {
+  var returnString = "";
+  for (i = 0; i < arr.length; i++) {
+    sample = arr[i];
+    if (sample >= 0) {
+      var r = toHexBigEndian(sample); }
+    else if (sample < 0) {
+      sample = sample + 65536; // (16 * 16 * 16 * 16)
+      var r = toHexBigEndian(sample); }
+    returnString = returnString.concat(r); }
+  return returnString; }
+
+function toHexBigEndian(s) {
+  var doubleCheck = s;
+  var int4 = s % 16;
+  s = parseInt(s / 16);
+  var int3 = s % 16;
+  s = parseInt(s / 16);
+  var int2 = s % 16;
+  s = parseInt(s / 16);
+  var int1 = s % 16;
+  s = parseInt(s / 16); 
+  //
+  // Make sure the hexadecimal-converted value equals the original value.
+  if (doubleCheck != validateHex(int1, int2, int3, int4)) {
+    alert("Failure: toHexBigEndian(" + s + ") != " + validateHex(int1, int2, int3, int4) + "."); }
+  //
+  return "%" + intToHex(int1) + intToHex(int2) + "%" + intToHex(int3) + intToHex(int4); 
+  }
+  
+function intToHex(n) {
+  if (n < 10) {
+    if (n >= 0) {
+      return n.toString(); 
+    } else { alert("Error: intToHex(" + n + ")"); }
+  }
+  switch (n) {
+    case 10:
+      var r = "a";
+      break;
+    case 11:
+      var r = "b";
+      break;
+    case 12:
+      var r = "c";
+      break;
+    case 13:
+      var r = "d";
+      break;
+    case 14:
+      var r = "e";
+      break;
+    case 15:
+      var r = "f";
+      break;
+    default:
+      alert("Error: intToHex(" + n + ")");
+      break; }
+  return r; }
+  
+function validateHex(w,x,y,z) {
+  var w = w * 16 * 16 * 16;
+  var x = x * 16 * 16;
+  var y = y * 16;
+  return w + x + y + z; }
+
+function download(filename, data) {
+  var pom = document.createElement('a');
+  pom.setAttribute('href', 'data:audio/pcm;charset=utf-8,' + data);
+  pom.setAttribute('download', filename);
+  if (document.createEvent) {
+    var event = document.createEvent('MouseEvents');
+    event.initEvent('click', true, true);
+    pom.dispatchEvent(event); }
+  else {
+    pom.click(); } }
+
+//function int16ArrayToHex(arr) {
+//  var returnString = "";
+//  for (i = 0; i < arr.length; i++) {
+//    //alert ("[i]=" + arr[i]);
+//    //var int16 = parseInt(arr[i]);
+//    //alert ("int=" + int16);
+//    var hexString = arr[i].toString(16); //leading zeroes are truncated by default.
+//    hexString = padLeadingZeroes(hexString);
+//    alert ("[i]=" + arr[i] + "; hex=" + hexString);
+//    //resource: https://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
+//    returnString = returnString.concat(hexString);
+//  } }
+//  
+// Recursive function to pad a given string with zeroes up to a length of 4 octets
+//function padLeadingZeroes(hexString) {
+//  if (hexString.length < 4) {
+//    hexString = padLeadingZeroes("0" + hexString); }
+//  else {
+//    return hexString;
+//  } }
+
+//
+// Download function
+// Send the encoded data to a downloadable file
+// Resource: https://stackoverflow.com/questions/2897619/using-html5-javascript-to-generate-and-save-a-file
+//
+
+</script>

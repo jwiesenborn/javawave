@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Diet Pumpkin Machine</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+    .row.content {height: 720px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height: auto;} 
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav">
+      <h4>Diet Pumpkin Machine</h4>
+      <ul class="nav nav-pills nav-stacked">
+        <li><a href="index.htm">Home</a></li>
+        <li><a href="pcm.htm">Pulse Code Modulation</a></li>
+        <li><a href="demo.htm">Demo</a></li>
+      </ul><br>
+    </div>
+
+    <div class="col-sm-9">
+      <h4><small>OUTPUT</small></h4>
+      <hr>
+      <h3>Data output</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by jesse, Aug 8, 2018.</h5>
+      <p>Before starting this project I thought I would use the MDN <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">Web Audio API</a>. What I saw after playing with it for awhile is that it's engineered for development more at the aural level rather than at the byte level. It didn't seem to allow for precise manipulation of the byte set and I couldn't locate any documentation for the lower level encoding. I also thought about playing the output directly in the browser, but I haven't plugged the data stream into the HTML5 audio element yet, and I prefer to avoid third-party extensions if at all possible.</p>
+      <p>[Edit 8/18/2018] This <a href="https://github.com/samirkumardas/pcm-player">in-browser PCM player</a> looks interesting.</p>
+      <h3>Saving files</h3>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by jesse, Jul 31, 2018.</h5>
+      <p>The purpose of this program is to make a file for the user to download.</p>
+      <p>This example uses code from a <a href="https://stackoverflow.com/questions/2897619/using-html5-javascript-to-generate-and-save-a-file">Stack Overflow thread</a>.</p>
+      <p>Another possible implementation is at <a href="https://stackoverflow.com/questions/31048215/how-to-create-txt-file-using-javascript-html5">this thread</a>.</p>
+      <p>Many people seem to prefer <a href="https://github.com/eligrey/FileSaver.js/">Filesaver.js</a> (<a href="https://eligrey.com/demos/FileSaver.js/">demo</a>) for cross-browser compatibility, but first I'd like to find a way to play the output directly.</p>
+      <p><input type="button" onclick="download('test.txt', 'Hello world!');" value="Click here" /></p>
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid">
+  <p>Jesse Wiesenborn</p>
+</footer>
+
+</body>
+</html>
+
+<script>
+
+function download(filename, text) {
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    pom.setAttribute('download', filename);
+
+    if (document.createEvent) {
+        var event = document.createEvent('MouseEvents');
+        event.initEvent('click', true, true);
+        pom.dispatchEvent(event);
+    }
+    else {
+        pom.click();
+    }
+}
+
+</script>

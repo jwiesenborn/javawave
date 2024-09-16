@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>WimpyCat</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+    .row.content {height: 720px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height: auto;} 
+    }
+    
+    /* Tab code from https://www.computerhope.com/issues/ch001034.htm */
+    .tab1 { margin-left: 2em; }
+    .tab2 { margin-left: 4em; }
+    .tab3 { margin-left: 6em; }
+    
+    .codebox {
+    font-family: monospace;
+    font-size: 9pt;
+    color: blue;
+    background-color: cornsilk;
+    width: 70%;
+    border: 1px;
+    }
+
+}
+    
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav">
+      <h4>WimpyCat: 8-bit Music Player</h4>
+      <ul class="nav nav-pills nav-stacked">
+        <li><a href="index.htm">Home</a></li>
+        <li><a href="theory.htm">Hypothesis</a></li>
+        <li><a href="program.htm">Example Program</a></li>
+        <li><a href="harmony.htm">Harmonic Computation</a></li>
+        <li><a href="frequency.htm">The Frequency Equation</a></li>
+        <li><a href="triad.htm">A Triad</a></li>
+        <li><a href="timbre.htm">Wave Graph</a></li>
+        <li><a href="tone.htm">Tone</a></li>
+        <li><a href="sequences.htm">Sequences</a></li>
+        <li><a href="wave.htm">The WAV format</a></li>
+        <li><a href="offsets.htm">Offsets (Sequences Part 2)</a></li>
+        <li><a href="musicxml.htm">MusicXML</a></li>
+        <li class="active"><a href="synthesis.htm">Synthesis</a></li>
+        <li><a href="a_sigh.htm">A Sigh</a></li>
+        <li><a href="2019-05-26.htm">Streaming</a></li>
+        <li><a href="player.htm">Player</a></li>
+      </ul><br>
+    </div>
+
+    <div class="col-sm-9">
+      <h4><small>SYNTHESIS</small></h4>
+      <hr>
+      <h3>Synthesis</h3>
+      <p><h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 28 April 2019</h5></p>
+      <p>I fused Dr V's musicXML file with my math synthesizer. You can download the result here: <a href="https://drive.google.com/file/d/12TR1NgfCLLeUbsDu__F2adz68Ge5GRxx/view?usp=sharing">A Sigh (16-bit)</a>. You may need software that can play OGG files such as VLC media player. This is only the accompaniment, so sing along if you know the words!</p>
+      <p><a href="synth2.js">The program</a> is something of a hack. Web browsers really aren't optimized to handle large data sets, and will struggle with the millions of logic operations needed to handle uncompressed computations. I ended up rendering each of the seven pieces individually and compiled them with Audacity.</p>
+      <h3>Review</h3>
+      <p><h5><span class="glyphicon glyphicon-time"></span> Post by Jesse, 11 May 2019</h5></p>
+      <p>It should be possible to dynamically synthesize concurrent parts and retain decent processing speed. In the previous iteration, I tried to compute the seven or so different voices individually and then add them all together at the end. However, the memory read/write operations are the more computationally intensive operations of the program, so it isn't practical to compute each voice or channel separately. It should be faster (or at least possible) to sum them up at the same time, say, once per measure, and keep it together in only one data stream at runtime.</p>
+      <p>That brings me to a retrospective of the synthesis program so far, and the fact that I ran into a few snags processing the musicXML file directly. Ideally this would be an object that is accessible and manipulable as soon as it is opened. In practice, I found some quirks that interrupt a direct linear processing of the music. Each note of a chord was not necessarily defined with the same duration, for instance, which leads to asynchrony in the sum of different voices if they are not added up for each chord. There were also a few measures where the number of voices decreased or increased. As I had already manually defined seven arrays for the part, I ended up modifying the source file to linearize the anomalies. This approach  served as a proof-of-concept. It is not pragmatic for playing more songs, which I would eventually like it to do.</p>
+      <p>Going forward I would like to organize the XML interpreter into something more object-oriented. Object-oriented music will be more comprehensive, which will make it easier to compute multiple voices in synchrony, and allow for extensibility of music objects such as recursive sounds.</p>
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid">
+  <p>Jesse Wiesenborn | <a href="https://github.com/jwiesenborn/javawave">GitHub</a></p>
+</body>
+</html>
+
+</script>
